@@ -2,6 +2,7 @@ from django.urls import path
 from django.contrib import admin
 from analyzer import simple_views  # این خط را اضافه کنید
 
+
 urlpatterns = [
 
     path('', simple_views.dashboard, name='dashboard'),

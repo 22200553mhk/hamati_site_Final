@@ -5,20 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="adeea251-48ae-46f7-8ead-5af0c5f58511" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.vs/ProjectSettings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.vs/PythonSettings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.vs/VSWorkspaceState.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.vs/edu/CopilotIndices/17.14.734.62261/CodeChunks.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.vs/edu/CopilotIndices/17.14.734.62261/SemanticSymbols.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.vs/edu/FileContentIndex/0c4c7f8f-4adb-489a-aae1-b9686dcc23ef.vsidx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.vs/edu/copilot-chat/b495bb92/sessions/52be9e31-ec22-4abe-b452-88f0bc6d11f0" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.vs/edu/v17/.wsuo" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.vs/edu/v17/DocumentLayout.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.vs/slnx.sqlite" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/staticfiles/admin/img.rar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/simple_views.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/simple_views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/analyzer/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/analyzer/base.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/analyzer/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/analyzer/dashboard.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -31,6 +22,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
@@ -46,7 +40,7 @@
     &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR_AND_PREVIEW&quot;,
+    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;F:/hamati_site_V1/edu&quot;,
@@ -108,7 +102,11 @@
       <workItem from="1752080473315" duration="1864000" />
       <workItem from="1752083109951" duration="3187000" />
       <workItem from="1752251956827" duration="2824000" />
-      <workItem from="1752303985488" duration="2248000" />
+      <workItem from="1752303985488" duration="3495000" />
+      <workItem from="1752310962951" duration="2729000" />
+      <workItem from="1752316730393" duration="15865000" />
+      <workItem from="1752341649774" duration="441000" />
+      <workItem from="1752343217824" duration="312000" />
     </task>
     <servers />
   </component>
