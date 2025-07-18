@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-eo0(uzc-ob(^=hm)+^4a(ej2j3xv=8h*-&n3gkq0o%(!^sm32m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '185.231.112.23']
+ALLOWED_HOSTS = ['127.0.0.1', 'planikaa.ir', '185.231.112.23']
 
 
 
