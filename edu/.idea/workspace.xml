@@ -4,9 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="adeea251-48ae-46f7-8ead-5af0c5f58511" name="Changes" comment="">
+    <list default="true" id="d50c454c-26a3-4168-840d-b97779a5594c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/3df7d781-bfea-46e8-93f9-5a749dde88a1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/3df7d781-bfea-46e8-93f9-5a749dde88a1/storage_v2/_src_/schema/main.uQUzAA.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/edu.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/edu.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/templates/analyzer/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/templates/analyzer/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/templates/analyzer/report.html" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/templates/analyzer/report.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/konkur/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/konkur/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/konkur/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/konkur/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,61 +29,37 @@
   <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
     <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="HTML File" />
-        <option value="Python Script" />
-        <option value="JavaScript File" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/analyzer/static/js/chart.min.js" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/analyzer/static/js/html2pdf.bundle.min.js" root0="FORCE_HIGHLIGHTING" />
-  </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
-  </component>
   <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 0
 }</component>
-  <component name="ProjectId" id="2zdxw6LFjl6nOhFXqTy5SxQd45d" />
+  <component name="ProjectId" id="303KMA3U6HNwnw64995z6cMIxA2" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Django Server.edu.executor&quot;: &quot;Run&quot;,
-    &quot;Python.simple_views.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;F:/hamati_site_V2_Final/edu&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Django Server.edu.executor": "Run",
+    "Python.manage.executor": "Debug",
+    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "django.template.preview.state": "SHOW_EDITOR_AND_PREVIEW",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="F:\hamati_site_V1_Final\edu\analyzer\static\analyzer" />
-      <recent name="F:\hamati_site_V1_Final\edu\analyzer\templates\analyzer" />
-      <recent name="F:\hamati_site_V1_Final\edu\analyzer" />
-    </key>
-  </component>
+}]]></component>
   <component name="RunManager">
     <configuration name="edu" type="Python.DjangoServer" factoryName="Django server">
       <module name="edu" />
@@ -82,7 +71,6 @@
         <env name="DJANGO_SETTINGS_MODULE" value="konkur.settings" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13 (edu)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -110,34 +98,19 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="adeea251-48ae-46f7-8ead-5af0c5f58511" name="Changes" comment="" />
-      <created>1752074988168</created>
+      <changelist id="d50c454c-26a3-4168-840d-b97779a5594c" name="Changes" comment="" />
+      <created>1752850766923</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1752074988168</updated>
-      <workItem from="1752074989592" duration="2330000" />
-      <workItem from="1752077522484" duration="2133000" />
-      <workItem from="1752080473315" duration="1864000" />
-      <workItem from="1752083109951" duration="3187000" />
-      <workItem from="1752251956827" duration="2824000" />
-      <workItem from="1752303985488" duration="3495000" />
-      <workItem from="1752310962951" duration="2729000" />
-      <workItem from="1752316730393" duration="15865000" />
-      <workItem from="1752341649774" duration="441000" />
-      <workItem from="1752343217824" duration="312000" />
-      <workItem from="1752420968365" duration="5930000" />
-      <workItem from="1752499341403" duration="11512000" />
-      <workItem from="1752585238253" duration="2982000" />
-      <workItem from="1752653740051" duration="15181000" />
-      <workItem from="1752677550461" duration="71000" />
-      <workItem from="1752842567035" duration="320000" />
+      <updated>1752850766923</updated>
+      <workItem from="1752850768396" duration="321000" />
+      <workItem from="1752851097051" duration="112000" />
+      <workItem from="1752851222272" duration="68000" />
+      <workItem from="1752851302358" duration="2170000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/edu$simple_views.coverage" NAME="simple_views Coverage Results" MODIFIED="1752585540799" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/analyzer" />
   </component>
 </project>
