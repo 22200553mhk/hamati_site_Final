@@ -1,0 +1,29 @@
+{% extends "analyzer/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card p-4 text-center fade-in">
+                {% if confirmation %}
+                    <div class="mb-3">
+                        <i class="fas fa-check-circle fa-3x text-success"></i>
+                    </div>
+                    <h1 class="h3 mb-3 fw-bold">ایمیل شما تایید شد!</h1>
+                    <p>حساب کاربری شما با موفقیت فعال شد. اکنون می‌توانید وارد شوید.</p>
+                    <div class="mt-4">
+                         <a href="{% url 'account_login' %}" class="btn btn-primary">ورود به حساب کاربری</a>
+                    </div>
+                {% else %}
+                    <div class="mb-3">
+                        <i class="fas fa-times-circle fa-3x text-danger"></i>
+                    </div>
+                    <h1 class="h3 mb-3 fw-bold">خطا در تایید ایمیل</h1>
+                    <p>لینکی که استفاده کرده‌اید نامعتبر یا منقضی شده است.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

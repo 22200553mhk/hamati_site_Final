@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>فعال‌سازی حساب کاربری</title>
+    <style>
+        body { font-family: 'Vazirmatn', Tahoma, sans-serif; margin: 0; padding: 0; background-color: #f5f7ff; }
+        .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .header { text-align: center; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; }
+        .header h1 { color: #4361ee; margin: 0; }
+        .content { padding: 20px 0; text-align: right; line-height: 1.8; }
+        .content p { margin: 15px 0; }
+        .button { display: block; width: 200px; margin: 30px auto; padding: 15px; background: linear-gradient(135deg, #4361ee, #3f37c9); color: #ffffff !important; text-align: center; text-decoration: none; border-radius: 50px; font-weight: bold; }
+        .footer { text-align: center; color: #888; font-size: 12px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>تحلیلگر کنکور</h1>
+        </div>
+        <div class="content">
+            <p>سلام {{ user.username }} عزیز،</p>
+            <p>از اینکه در سایت ما ثبت‌نام کردید متشکریم! برای فعال‌سازی حساب کاربری خود، لطفاً روی دکمه زیر کلیک کنید:</p>
+            <a href="{{ activate_url }}" class="button">فعال‌سازی حساب</a>
+            <p>با تشکر،<br>تیم تحلیلگر کنکور</p>
+        </div>
+        <div class="footer">
+            <p>این یک ایمیل خودکار است. لطفاً به آن پاسخ ندهید.</p>
+        </div>
+    </div>
+</body>
+</html>

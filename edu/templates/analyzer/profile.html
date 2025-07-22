@@ -1,0 +1,52 @@
+{% extends 'analyzer/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card mb-4" style="border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: none;">
+                <div class="card-body p-4 text-center">
+                    <h1 class="h3 mb-3">پروفایل کاربری</h1>
+                    <p class="text-muted">{{ user.email }}</p>
+                </div>
+            </div>
+
+            <div class="card fade-in" style="border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: none;">
+                <div class="card-header bg-primary text-white" style="border-radius: 15px 15px 0 0;">
+                    <h3 class="mb-0" style="color: white !important;">آزمون‌های ذخیره شده</h3>
+                </div>
+                <div class="card-body p-4">
+                    {% for exam in exams %}
+                        <div class="card mb-3">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 fw-normal">آزمون در تاریخ: {{ exam.created_at|date:"Y/m/d - H:i" }}</h5>
+                                <span class="badge bg-primary rounded-pill fs-6">میانگin کل: {{ exam.get_average_percentage|floatformat:1 }}%</span>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    {% for subject in exam.subjects.all %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            {{ subject.subject_name }}
+                                            <span class="badge bg-secondary rounded-pill">{{ subject.percentage|floatformat:1 }}%</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="alert alert-warning text-center" role="alert">
+                            شما هنوز هیچ آزمونی را ذخیره نکرده‌اید.
+                        </div>
+                    {% endfor %}
+
+                    <hr class="my-4">
+                    <div class="text-center">
+                        <a href="{% url 'delete_account' %}" class="btn btn-danger">حذف حساب کاربری</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

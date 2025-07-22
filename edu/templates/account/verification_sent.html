@@ -1,0 +1,21 @@
+{% extends "analyzer/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card p-4 text-center fade-in">
+                <div class="mb-3">
+                    <i class="fas fa-paper-plane fa-3x text-info"></i>
+                </div>
+                <h1 class="h3 mb-3 fw-bold">ایمیل تایید ارسال شد</h1>
+                <p>یک ایمیل برای تایید حساب کاربری به آدرس شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه هرزنامه (Spam) خود را بررسی کرده و روی لینک فعال‌سازی کلیک کنید.</p>
+                <div class="mt-4">
+                     <a href="{% url 'dashboard' %}" class="btn btn-secondary">بازگشت به صفحه اصلی</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

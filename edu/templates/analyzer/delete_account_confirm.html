@@ -1,0 +1,24 @@
+{% extends 'analyzer/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card p-4 text-center border-danger">
+                <h1 class="h3 mb-3 fw-bold text-danger">حذف حساب کاربری</h1>
+                <p class="mb-4">آیا مطمئن هستید که می‌خواهید حساب کاربری خود را برای همیشه حذف کنید؟</p>
+                <p class="text-muted small"><strong>توجه:</strong> این عمل غیرقابل بازگشت است و تمام اطلاعات شما، از جمله آزمون‌های ذخیره شده، برای همیشه پاک خواهد شد.</p>
+                
+                <form method="post" action="{% url 'delete_account' %}">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2 mt-4">
+                        <button class="btn btn-danger" type="submit">بله، حسابم را حذف کن</button>
+                        <a class="btn btn-secondary" href="{% url 'user_profile' %}">نه، منصرف شدم</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

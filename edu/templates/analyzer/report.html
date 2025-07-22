@@ -1,0 +1,337 @@
+{% extends 'analyzer/base.html' %}
+{% block content %}
+
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0/dist/chartjs-plugin-annotation.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+  body, #report-page {
+    font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+    direction: rtl !important;
+    unicode-bidi: embed !important;
+    background-color: #f5f7ff;
+    color: #333;
+  }
+
+  #report-page {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    padding: 20px;
+    background-color: white;
+  }
+
+  .button {
+    padding: 12px 25px;
+    margin: 10px 5px;
+    background: #4361ee;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .button.back {
+    background: #6c757d;
+  }
+
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+  }
+
+  .summary-boxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  .summary-box {
+    flex: 1;
+    min-width: 200px;
+    background: #f6f8ff;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #e0e6ff;
+  }
+
+  .chart-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto 40px auto;
+    padding: 10px;
+  }
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .subject-section {
+    border: 1px solid #e0e6ff;
+    border-radius: 10px;
+    margin-top: 40px;
+    padding: 25px;
+    page-break-before: always;
+    background-color: white;
+  }
+  .subject-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .subject-title {
+    font-size: 20px;
+    color: #3a36e0;
+  }
+  .subject-percentage {
+    background: linear-gradient(135deg,#4361ee,#3a36e0);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  th, td {
+    text-align: right;
+    padding: 12px;
+    border-bottom: 1px solid #eef2ff;
+  }
+  th {
+    background: #f0f4ff;
+    color: #3a36e0;
+  }
+  .tip {
+    background: #f0f8ff;
+    border-right: 5px solid #4361ee;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 8px;
+  }
+</style>
+
+<div id="report-page">
+
+  <div class="no-print" style="text-align:center; margin-bottom: 20px;">
+    <button class="button" onclick="generatePDF()">📄 دانلود PDF</button>
+    <a href="{% url 'dashboard' %}" class="button back">بازگشت به داشبورد</a>
+    <span id="loading" style="display:none;">در حال تولید PDF...</span>
+  </div>
+
+  <h1 style="text-align:center; color:#3a36e0; margin-bottom: 5px;">گزارش تحلیلی آزمون</h1>
+  <p style="text-align:center; margin-top:0;">
+    تاریخ:&#8207;{{ today_jalali_date }}
+  </p>
+
+  <h2>خلاصه نتایج</h2>
+  <div class="summary-boxes">
+    <div class="summary-box">
+      <div class="label">تعداد دروس</div>
+      <div class="value">{{ report_items|length }}</div>
+    </div>
+    <div class="summary-box">
+      <div class="label">میانگین درصد</div>
+      <div class="value">{{ avg_percentage }}%</div>
+    </div>
+    <div class="summary-box">
+      <div class="label">کل سوالات</div>
+      <div class="value">{{ total_questions }}</div>
+    </div>
+    <div class="summary-box">
+      <div class="label">پاسخ صحیح</div>
+      <div class="value">{{ total_correct }}</div>
+    </div>
+  </div>
+
+  <h2>نمودار مقایسه درصد دروس</h2>
+  <div class="chart-container">
+    <canvas id="barChart" width="800" height="500"></canvas>
+  </div>
+
+  {% for item in report_items %}
+  <div class="subject-section">
+    <h2 style="margin-bottom: 20px;">تحلیل تفصیلی درس {{ item.subject_name }}</h2>
+
+    <div class="subject-header">
+      <h3 class="subject-title">درس {{ item.subject_name }}</h3>
+      <div class="subject-percentage">{{ item.subject_data.percentage }}%</div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>مورد</th><th>مقدار</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>تعداد کل سوالات</td><td>{{ item.subject_data.total }}</td></tr>
+        <tr><td>پاسخ صحیح</td><td>{{ item.subject_data.correct }}</td></tr>
+        <tr><td>پاسخ غلط</td><td>{{ item.subject_data.wrong }}</td></tr>
+        <tr><td>بی‌پاسخ</td><td>{{ item.subject_data.blank }}</td></tr>
+      </tbody>
+    </table>
+    <h4>توصیه‌ها:</h4>
+    {% for feedback in item.feedback %}
+    <div class="tip">• {{ feedback|safe }}</div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+
+  {% if user.is_authenticated %}
+  <div class="subject-section user-section">
+    <h2 style="margin-bottom: 20px;">ویژه شما (کاربر وارد شده)</h2>
+    <div class="no-print text-center mb-4">
+        <button id="save-exam-btn" class="button" {% if is_exam_saved %}disabled{% endif %}>
+            {% if is_exam_saved %}آزمون ذخیره شده است{% else %}ذخیره این آزمون در پروفایل{% endif %}
+        </button>
+    </div>
+
+    {% if historical_feedback %}
+    <div class="historical-feedback">
+        <h4><i class="bi bi-graph-up"></i> تحلیل روند عملکرد شما</h4>
+        {% for item in historical_feedback %}
+            <div class="tip">• {{ item|safe }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+  </div>
+
+<script>
+  async function generatePDF() {
+    document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
+    document.getElementById('loading').style.display = 'inline-block';
+
+    const opt = {
+      margin: 0.5,
+      filename: 'گزارش_تحلیلی_آزمون.pdf',
+      html2canvas: {
+        scale: 1.3,
+        useCORS: true,
+        letterRendering: true,
+        dpi: 192,
+        backgroundColor: null,
+        scrollY: 0,
+        fontFamily: "'Vazirmatn', Tahoma, sans-serif"
+      },
+      jsPDF: {
+        unit: 'in',
+        format: 'a4',
+        orientation: 'portrait',
+        hotfixes: ["px_scaling"]
+      }
+    };
+
+    const element = document.getElementById('report-page');
+
+    try {
+      await html2pdf().set(opt).from(element).save();
+    } catch (e) {
+      console.error('خطا در تولید PDF:', e);
+    }
+
+    document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
+    document.getElementById('loading').style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    Chart.register(window['chartjs-plugin-annotation']);
+    const ctx = document.getElementById('barChart').getContext('2d');
+
+    const colors = ['#4361ee', '#3dd598', '#ffc542', '#ff6b6b', '#5c7cfa', '#20c997', '#fab005', '#f03e3e'];
+    const labels = {{ subjects_json|safe }};
+    const data = {{ percentages_json|safe }};
+    const bgColors = labels.map((_, i) => colors[i % colors.length]);
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'درصد',
+          data: data,
+          backgroundColor: bgColors,
+          borderColor: bgColors,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: false,
+        maintainAspectRatio: true,
+        scales: {
+          y: {
+            beginAtZero: false,
+            suggestedMin: -30,
+            suggestedMax: 100,
+            ticks: {
+              callback: v => v + '%'
+            },
+            grid: {
+              color: 'rgba(0,0,0,0.1)'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          annotation: {
+            annotations: {
+              zeroLine: {
+                type: 'line',
+                yMin: 0,
+                yMax: 0,
+                borderColor: 'red',
+                borderWidth: 2,
+                borderDash: [6, 6]
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // --- اسکریپت جدید برای دکمه ذخیره ---
+    {% if user.is_authenticated %}
+    const saveBtn = document.getElementById('save-exam-btn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', function() {
+            const btn = this;
+            btn.disabled = true;
+            btn.textContent = 'در حال ذخیره...';
+            fetch("{% url 'save_exam_to_db' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // CSRF token را از کوکی‌ها یا متا تگ‌ها بخوانید
+                    // برای سادگی، فرض می‌کنیم در view به صورت کوکی ارسال شده
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.status === 'success' || data.status === 'info') {
+                    btn.textContent = 'ذخیره شد';
+                } else {
+                    btn.textContent = 'خطا در ذخیره';
+                    btn.disabled = false;
+                }
+            });
+        });
+    }
+    {% endif %}
+    // --- پایان اسکریپت جدید ---
+  });
+</script>
+
+{% endblock %}
