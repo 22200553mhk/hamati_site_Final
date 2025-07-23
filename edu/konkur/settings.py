@@ -18,7 +18,6 @@ MICROSOFT_CLIENT_ID_VAR = os.getenv('MICROSOFT_CLIENT_ID')
 MICROSOFT_CLIENT_SECRET_VAR = os.getenv('MICROSOFT_CLIENT_SECRET')
 # --------------------------------------
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'planikaa.ir', '185.231.112.23', 'www.planikaa.ir']
@@ -54,6 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'analyzer.middleware.EmailVerificationMiddleware',
+
 ]
 
 ROOT_URLCONF = 'konkur.urls'
@@ -106,7 +106,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-SITE_ID = 2 # شما این مقدار را 2 قرار داده بودید، من آن را حفظ کردم
+SITE_ID = 2
 
 # Account Configuration
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
@@ -114,10 +114,11 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
 ACCOUNT_SESSION_REMEMBER = True
-ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGOUT_ON_GET = False
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -131,7 +132,6 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER_VAR
 # URLs
 LOGIN_REDIRECT_URL = '/account/redirect/'
 LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 
 # Social Auth Providers
 SOCIALACCOUNT_PROVIDERS = {
@@ -151,9 +151,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SOCIALACCOUNT_ADAPTER = 'analyzer.adapter.MySocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = "analyzer.adapters.MySocialAccountAdapter"
 
-# Security Settings
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+

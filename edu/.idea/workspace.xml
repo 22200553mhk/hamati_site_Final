@@ -8,7 +8,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d50c454c-26a3-4168-840d-b97779a5594c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/edu.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/edu.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/adapter.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/apps.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/apps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/middleware.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/middleware.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/simple_views.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/simple_views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/konkur/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/konkur/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/konkur/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/konkur/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/analyzer/report.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/analyzer/report.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,6 +33,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="HTML File" />
+        <option value="CSS File" />
         <option value="Python Script" />
       </list>
     </option>
@@ -49,11 +61,13 @@
     "Python.manage.executor": "Debug",
     "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
     "RunOnceActivity.git.unshallow": "true",
     "django.template.preview.state": "SHOW_EDITOR_AND_PREVIEW",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "E:/hamati_site_Final/edu",
+    "last_opened_file_path": "D:/hamati_site_Final/edu",
+    "list.type.of.created.stylesheet": "CSS",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -99,7 +113,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-598b0484d0b5-e2d783800521-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.26927.74" />
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-PY-251.26094.141" />
+        <option value="bundled-python-sdk-9f8e2b94138c-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.26094.141" />
       </set>
     </attachedChunks>
   </component>
@@ -115,6 +130,10 @@
       <workItem from="1752851097051" duration="112000" />
       <workItem from="1752851222272" duration="68000" />
       <workItem from="1752851302358" duration="2170000" />
+      <workItem from="1753289047230" duration="148000" />
+      <workItem from="1753289216236" duration="17000" />
+      <workItem from="1753289256919" duration="90000" />
+      <workItem from="1753289372756" duration="10942000" />
     </task>
     <servers />
   </component>

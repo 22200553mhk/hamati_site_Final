@@ -8,6 +8,10 @@ from .decorators import email_verified_required_custom
 from django.apps import AppConfig
 from allauth.account.signals import email_confirmed
 from django.dispatch import receiver
+from allauth.account.views import LoginView
+from allauth.account.models import EmailAddress
+from django.contrib import messages
+
 
 import jdatetime
 from django.contrib.auth import logout
@@ -286,3 +290,18 @@ class YourAppConfig(AppConfig):
         def update_user_email(sender, request, email_address, **kwargs):
             email_address.verified = True
             email_address.save()
+
+class CustomLoginView(LoginView):
+    def form_valid(self, form):
+        user = form.user
+
+        # بررسی کنیم که ایمیل تایید شده یا نه
+        try:
+            email_address = EmailAddress.objects.get(user=user, email=user.email)
+            if not email_address.verified:
+                messages.warning(self.request, "برای ورود، ابتدا باید ایمیل خود را تایید کنید.")
+                return redirect('account_email_verification_sent')  # فقط منتقل می‌کنه، ایمیل نمی‌فرسته
+        except EmailAddress.DoesNotExist:
+            pass
+
+        return super().form_valid(form)

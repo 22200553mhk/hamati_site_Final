@@ -3,13 +3,11 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import jdatetime
-
 from datetime import datetime
-import traceback
 
 
 def dashboard(request):
-    """داشبورد اصلی را رندر می‌کند."""
+    """داشبورد اصلی را رندر می‌کند و داده‌های قبلی را پاک می‌کند."""
     if 'test_results' in request.session:
         del request.session['test_results']
         request.session.modified = True
@@ -17,18 +15,20 @@ def dashboard(request):
 
 
 def calculate_percentage(correct, wrong, total):
-    """محاسبه درصد آزمون با احتساب نمره منفی (از -33.3 تا 100)."""
-    if total == 0: return 0
+    """محاسبه درصد آزمون با نمره منفی (از -33.3 تا 100)."""
+    if total == 0:
+        return 0
     score = (correct * 3) - wrong
     max_possible_score = total * 3
-    if max_possible_score == 0: return 0
+    if max_possible_score == 0:
+        return 0
     percentage = (score / max_possible_score) * 100
     return round(percentage, 2)
 
 
 @csrf_exempt
 def save_result(request):
-    """نتایج آزمون را از کاربر دریافت، پردازش و در سشن ذخیره می‌کند."""
+    """ذخیره نتایج آزمون در سشن."""
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -72,7 +72,7 @@ def save_result(request):
 
 
 def generate_subject_feedback(subject, data):
-    """بازخورد هوشمند برای هر درس تولید می‌کند."""
+    """تولید بازخورد تحلیلی برای هر درس."""
     feedback = []
     percentage = round(data.get('percentage', 0), 1)
     study_hours = data.get('study_hours', 0)
@@ -82,7 +82,6 @@ def generate_subject_feedback(subject, data):
     wrong = data.get('wrong', 0)
     blank = data.get('blank', 0)
 
-    # توصیه اول: درباره بهره‌وری مطالعه
     if study_hours > 0:
         if productivity > 0:
             hours_per_percent = 1 / productivity
@@ -102,7 +101,6 @@ def generate_subject_feedback(subject, data):
             feedback.append(
                 f"درصد شما در {subject} بدون مطالعه صفر بوده است. این فرصت خوبی برای یک شروع تازه و قدرتمند است.")
 
-    # توصیه دوم: درباره مدیریت ریسک و تست‌زنی
     if wrong > 0:
         risk_ratio = wrong / (correct + wrong) * 100
         if risk_ratio > 30:
@@ -116,7 +114,6 @@ def generate_subject_feedback(subject, data):
             feedback.append(
                 "هیچ پاسخ غلطی نداشته‌اید! این نشان‌دهنده دقت بالا و تسلط خوب شما بر مباحث است.")
 
-    # توصیه سوم: درباره تست‌های تمرینی
     if practice > 0:
         effectiveness = round(data.get('practice_effectiveness', 0), 1)
         if effectiveness > 5:
@@ -133,7 +130,7 @@ def generate_subject_feedback(subject, data):
 
 
 def generate_report(request):
-    """گزارش نهایی را با آماده‌سازی داده‌ها برای قالب HTML رندر می‌کند."""
+    """ایجاد و رندر گزارش نهایی."""
     if 'test_results' not in request.session or not request.session['test_results']:
         return HttpResponse("لطفاً ابتدا اطلاعات تمام دروس را از صفحه اصلی وارد کنید.")
 
@@ -156,8 +153,10 @@ def generate_report(request):
         'avg_percentage': f"{avg_percentage:.1f}",
         'total_questions': sum(d['total'] for d in test_results.values()),
         'total_correct': sum(d['correct'] for d in test_results.values()),
-        'subjects_json': json.dumps(list(test_results.keys())),
-        'percentages_json': json.dumps([d['percentage'] for d in test_results.values()]),
+
+        # داده‌ها برای جاوااسکریپت به صورت امن ارسال می‌شوند
+        'subjects': list(test_results.keys()),
+        'percentages': [d['percentage'] for d in test_results.values()],
     }
 
     return render(request, 'analyzer/report.html', context)

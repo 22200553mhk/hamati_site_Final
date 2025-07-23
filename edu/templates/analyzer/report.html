@@ -1,8 +1,8 @@
 {% extends 'analyzer/base.html' %}
+{% load json_script %}
 {% block content %}
 
 <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0/dist/chartjs-plugin-annotation.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -182,26 +182,11 @@
   </div>
   {% endfor %}
 
-  {% if user.is_authenticated %}
-  <div class="subject-section user-section">
-    <h2 style="margin-bottom: 20px;">ویژه شما (کاربر وارد شده)</h2>
-    <div class="no-print text-center mb-4">
-        <button id="save-exam-btn" class="button" {% if is_exam_saved %}disabled{% endif %}>
-            {% if is_exam_saved %}آزمون ذخیره شده است{% else %}ذخیره این آزمون در پروفایل{% endif %}
-        </button>
-    </div>
+</div>
 
-    {% if historical_feedback %}
-    <div class="historical-feedback">
-        <h4><i class="bi bi-graph-up"></i> تحلیل روند عملکرد شما</h4>
-        {% for item in historical_feedback %}
-            <div class="tip">• {{ item|safe }}</div>
-        {% endfor %}
-    </div>
-    {% endif %}
-  </div>
-  {% endif %}
-  </div>
+<!-- ارسال داده‌ها به جاوااسکریپت به صورت امن -->
+{{ subjects|json_script:"subjects-data" }}
+{{ percentages|json_script:"percentages-data" }}
 
 <script>
   async function generatePDF() {
@@ -245,8 +230,8 @@
     const ctx = document.getElementById('barChart').getContext('2d');
 
     const colors = ['#4361ee', '#3dd598', '#ffc542', '#ff6b6b', '#5c7cfa', '#20c997', '#fab005', '#f03e3e'];
-    const labels = {{ subjects_json|safe }};
-    const data = {{ percentages_json|safe }};
+    const labels = JSON.parse(document.getElementById('subjects-data').textContent);
+    const data = JSON.parse(document.getElementById('percentages-data').textContent);
     const bgColors = labels.map((_, i) => colors[i % colors.length]);
 
     new Chart(ctx, {
@@ -299,38 +284,6 @@
         }
       }
     });
-
-    // --- اسکریپت جدید برای دکمه ذخیره ---
-    {% if user.is_authenticated %}
-    const saveBtn = document.getElementById('save-exam-btn');
-    if (saveBtn) {
-        saveBtn.addEventListener('click', function() {
-            const btn = this;
-            btn.disabled = true;
-            btn.textContent = 'در حال ذخیره...';
-            fetch("{% url 'save_exam_to_db' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // CSRF token را از کوکی‌ها یا متا تگ‌ها بخوانید
-                    // برای سادگی، فرض می‌کنیم در view به صورت کوکی ارسال شده
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                if (data.status === 'success' || data.status === 'info') {
-                    btn.textContent = 'ذخیره شد';
-                } else {
-                    btn.textContent = 'خطا در ذخیره';
-                    btn.disabled = false;
-                }
-            });
-        });
-    }
-    {% endif %}
-    // --- پایان اسکریپت جدید ---
   });
 </script>
 
