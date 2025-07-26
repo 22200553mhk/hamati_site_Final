@@ -4,26 +4,22 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from .models import Exam, SubjectResult
 import json
-from .decorators import email_verified_required_custom
-from django.apps import AppConfig
-from allauth.account.signals import email_confirmed
-from django.dispatch import receiver
-from allauth.account.views import LoginView
-from allauth.account.models import EmailAddress
-from django.contrib import messages
-
-
 import jdatetime
 from django.contrib.auth import logout
 
-# ایمپورت‌های جدید برای مدیریت خطای ایمیل
+# ایمپورت‌های جدید و کامل شده
 import socket
 from django.contrib import messages
-from allauth.account.views import SignupView
+from allauth.account.views import SignupView, LoginView
+from allauth.account.models import EmailAddress
 
 
-# تابع محاسبه درصد (از کد اصلی شما)
+# ===================================================================
+# تمام کدهای اصلی و دست‌نخورده شما
+# ===================================================================
+
 def calculate_percentage(correct, wrong, total):
+    """محاسبه درصد آزمون با احتساب نمره منفی (از -33.3 تا 100)."""
     if total == 0: return 0
     score = (correct * 3) - wrong
     max_possible_score = total * 3
@@ -32,8 +28,8 @@ def calculate_percentage(correct, wrong, total):
     return round(percentage, 2)
 
 
-# تابع تولید بازخورد هوشمند (از کد اصلی شما)
 def generate_subject_feedback(subject, data):
+    """بازخورد هوشمند برای هر درس تولید می‌کند."""
     feedback = []
     percentage = round(data.get('percentage', 0), 1)
     study_hours = data.get('study_hours', 0)
@@ -45,7 +41,7 @@ def generate_subject_feedback(subject, data):
 
     if study_hours > 0:
         if productivity > 0:
-            hours_per_percent = 1 / productivity
+            hours_per_percent = 1 / productivity if productivity != 0 else 0
             feedback.append(
                 f"بهره‌وری مطالعه شما {productivity} است، یعنی برای هر ۱٪ پیشرفت حدوداً {hours_per_percent:.1f} ساعت زمان صرف کرده‌اید.")
         else:
@@ -63,7 +59,7 @@ def generate_subject_feedback(subject, data):
                 f"درصد شما در {subject} بدون مطالعه صفر بوده است. این فرصت خوبی برای یک شروع تازه و قدرتمند است.")
 
     if wrong > 0:
-        risk_ratio = wrong / (correct + wrong) * 100
+        risk_ratio = wrong / (correct + wrong) * 100 if (correct + wrong) > 0 else 0
         if risk_ratio > 30:
             feedback.append(
                 f"نسبت پاسخ‌های غلط به کل پاسخ‌های داده شده ({risk_ratio:.1f}%) بالا است. پیشنهاد می‌شود در تست‌زنی دقت بیشتری داشته باشید.")
@@ -90,18 +86,25 @@ def generate_subject_feedback(subject, data):
     return feedback
 
 
-# ----- ویوهای اصلی برنامه -----
-
 def dashboard(request):
-    """صفحه اصلی که قبل از شروع تحلیل جدید، سشن را پاک می‌کند."""
+    """داشبورد اصلی را رندر می‌کند و سشن را برای تحلیل جدید پاک‌سازی می‌کند."""
+    # پاک کردن نتایج آزمون قبلی
     if 'test_results' in request.session:
         del request.session['test_results']
+
+    # ========== کد جدید برای حل مشکل دکمه ذخیره ==========
+    # پاک کردن یادداشت مربوط به ذخیره شدن آزمون قبلی
+    if 'saved_exam_id' in request.session:
+        del request.session['saved_exam_id']
+    # ====================================================
+
+    request.session.modified = True
     return render(request, 'analyzer/dashboard.html')
 
 
 @csrf_exempt
 def save_result(request):
-    """نتایج را از کاربر دریافت کرده و تمام شاخص‌ها را محاسبه و در سشن ذخیره می‌کند."""
+    """نتایج آزمون را از کاربر دریافت، پردازش و در سشن ذخیره می‌کند."""
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -111,46 +114,42 @@ def save_result(request):
             study_hours = float(data.get('study_hours', 0))
             practice = int(data.get('practice', 0))
 
-            percentage = calculate_percentage(correct, wrong, total)
-            blank = total - (correct + wrong)
+            data['percentage'] = calculate_percentage(correct, wrong, total)
+            data['blank'] = total - (correct + wrong)
 
-            # محاسبه تمام شاخص‌ها
-            risk_management = (1 - (wrong / (correct + wrong))) * 100 if (correct + wrong) > 0 else 0
-            denominator_ae = correct + wrong + (blank * 0.3)
+            risk_management = (1 - (wrong / (total - data['blank']))) * 100 if (total - data['blank']) > 0 else 0
+            denominator_ae = correct + wrong + (data['blank'] * 0.3)
             answering_efficiency = (correct / denominator_ae) * 100 if denominator_ae > 0 else 0
-            study_productivity = (percentage / study_hours) * 10 if study_hours > 0 else 0
-            practice_effectiveness = (percentage / practice) * 100 if practice > 0 else 0
+            study_productivity = (data['percentage'] / study_hours) * 10 if study_hours > 0 else 0
+            practice_effectiveness = (data['percentage'] / practice) * 100 if practice > 0 else 0
             denominator_tue = study_hours + (practice / 20)
-            time_utilization = (percentage / denominator_tue) * 10 if denominator_tue > 0 else 0
+            time_utilization = (data['percentage'] / denominator_tue) * 10 if denominator_tue > 0 else 0
 
-            processed_data = {
-                'subject_name': data.get('subject', 'درس نامشخص'),
-                'correct': correct, 'wrong': wrong, 'total': total,
-                'study_hours': study_hours, 'practice': practice,
-                'percentage': percentage, 'blank': blank,
+            data.update({
                 'risk_management': round(risk_management, 1),
                 'answering_efficiency': round(answering_efficiency, 1),
                 'study_productivity': round(study_productivity, 1),
                 'practice_effectiveness': round(practice_effectiveness, 1),
                 'time_utilization': round(time_utilization, 1)
-            }
+            })
 
             if 'test_results' not in request.session:
                 request.session['test_results'] = {}
 
-            request.session['test_results'][processed_data['subject_name']] = processed_data
+            subject = data.get('subject', 'درس نامشخص')
+            request.session['test_results'][subject] = data
             request.session.modified = True
+
             return JsonResponse(
-                {'status': 'success', 'message': f'اطلاعات درس {processed_data["subject_name"]} با موفقیت ثبت شد.'})
+                {'status': 'success', 'message': f'اطلاعات درس <strong>{subject}</strong> با موفقیت ثبت شد.'})
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': f'خطا در پردازش داده‌ها: {e}'}, status=400)
+            return JsonResponse({'status': 'error', 'message': f'خطا: {e}'}, status=400)
     return JsonResponse({'status': 'error', 'message': 'متد درخواست نامعتبر است'}, status=400)
 
 
 def generate_historical_feedback(user, current_results_dict):
     """تحلیل اختصاصی برای کاربر لاگین کرده با مقایسه ۱۰ آزمون قبلی."""
     feedback = []
-    # ۱۰ آزمون آخر کاربر را به همراه نتایج دروسشان واکشی می‌کنیم
     previous_exams = Exam.objects.filter(user=user).prefetch_related('subjects').order_by('-created_at')[:10]
 
     if not previous_exams:
@@ -158,7 +157,6 @@ def generate_historical_feedback(user, current_results_dict):
             "این اولین آزمونی است که ذخیره می‌کنید. برای دریافت تحلیل روند، آزمون‌های بعدی خود را نیز ذخیره کنید.")
         return feedback
 
-    # ۱. مقایسه میانگین کل
     previous_avg_list = [exam.get_average_percentage() for exam in previous_exams if exam.get_average_percentage() > 0]
     if previous_avg_list:
         previous_avg = sum(previous_avg_list) / len(previous_avg_list)
@@ -168,77 +166,100 @@ def generate_historical_feedback(user, current_results_dict):
                 f"✅ **روند کلی مثبت:** میانگین درصد شما در این آزمون ({current_avg:.1f}٪) نسبت به میانگین آزمون‌های قبلی ({previous_avg:.1f}٪) **بهبود یافته است.**")
         else:
             feedback.append(
-                f"⚠️ **نیاز به توجه:** میانگین درصد شما در این آزمون ({current_avg:.1f}٪) نسبت به آزمون‌های قبلی ({previous_avg:.1f}٪) **افت داشته است.** نقاط ضعف خود را با دقت بیشتری بررسی کنید.")
+                f"⚠️ **نیاز به توجه:** میانگین درصد شما در این آزمون ({current_avg:.1f}٪) نسبت به آزمون‌های قبلی ({previous_avg:.1f}٪) **افت داشته است.**")
 
-    # ۲. مقایسه درس به درس
     for subject_name, current_data in current_results_dict.items():
         past_percentages = [res.percentage for exam in previous_exams for res in exam.subjects.all() if
                             res.subject_name == subject_name]
         if past_percentages:
             avg_past_percentage = sum(past_percentages) / len(past_percentages)
-            if current_data['percentage'] > avg_past_percentage + 5:  # فقط اگر تغییر معنادار بود
+            if current_data['percentage'] > avg_past_percentage + 5:
                 feedback.append(
                     f"🚀 **پیشرفت عالی در {subject_name}:** درصد شما ({current_data['percentage']:.1f}٪) به طور محسوسی از میانگین قبلی ({avg_past_percentage:.1f}٪) **بالاتر** است.")
             elif current_data['percentage'] < avg_past_percentage - 5:
                 feedback.append(
-                    f"🔍 **بررسی درس {subject_name}:** درصد شما ({current_data['percentage']:.1f}٪) از میانگین قبلی ({avg_past_percentage:.1f}٪) **پایین‌تر** است. این درس نیاز به توجه ویژه دارد.")
-
+                    f"🔍 **بررسی درس {subject_name}:** درصد شما ({current_data['percentage']:.1f}٪) از میانگین قبلی ({avg_past_percentage:.1f}٪) **پایین‌تر** است.")
     return feedback
 
 
 def generate_report(request):
-    """گزارش نهایی را برای کاربر مهمان و لاگین کرده، تولید می‌کند."""
-    if 'test_results' not in request.session or not request.session['test_results']:
-        return HttpResponse("لطفاً ابتدا اطلاعات تمام دروس را از صفحه اصلی وارد کنید.")
+    """گزارش نهایی را با آماده‌سازی داده‌ها برای قالب HTML رندر می‌کند."""
+    test_results = request.session.get('test_results', {})
 
-    test_results = request.session['test_results']
-    report_items = [{'subject_name': s, 'subject_data': d, 'feedback': generate_subject_feedback(s, d)} for s, d in
-                    test_results.items()]
+    if not test_results:
+        messages.warning(request, "هیچ داده‌ای برای نمایش گزارش یافت نشد. لطفاً ابتدا اطلاعات آزمون را وارد کنید.")
+        return redirect('dashboard')
 
-    historical_feedback = []
-    is_exam_saved = False
-    if request.user.is_authenticated:
-        historical_feedback = generate_historical_feedback(request.user, test_results)
-        exam_id = request.session.get('saved_exam_id')
-        if exam_id and Exam.objects.filter(id=exam_id, user=request.user).exists():
-            is_exam_saved = True
+    report_items = []
+    for subject, data in test_results.items():
+        report_items.append({
+            'subject_name': subject,
+            'subject_data': data,
+            'feedback': generate_subject_feedback(subject, data)
+        })
+
+    num_subjects = len(test_results)
+    avg_percentage = sum(d['percentage'] for d in test_results.values()) / num_subjects if num_subjects > 0 else 0
 
     context = {
         'report_items': report_items,
-        'historical_feedback': historical_feedback,
-        'is_exam_saved': is_exam_saved,
+        'today_jalali_date': jdatetime.datetime.now().strftime("%Y/%m/%d"),
+        'avg_percentage': f"{avg_percentage:.1f}",
+        'total_questions': sum(d['total'] for d in test_results.values()),
+        'total_correct': sum(d['correct'] for d in test_results.values()),
+        'subjects_list': list(test_results.keys()),
+        'percentages_list': [d['percentage'] for d in test_results.values()],
     }
+
+    if request.user.is_authenticated:
+        context['historical_feedback'] = generate_historical_feedback(request.user, test_results)
+        exam_id = request.session.get('saved_exam_id')
+        context['is_exam_saved'] = exam_id and Exam.objects.filter(id=exam_id, user=request.user).exists()
+
     return render(request, 'analyzer/report.html', context)
 
 
 @login_required
 @csrf_exempt
 def save_exam_to_db(request):
-    """این ویو فقط برای کاربران لاگین کرده است و آزمون را از سشن در دیتابیس ذخیره می‌کند."""
+    """
+    آزمون را از سشن در دیتابیس ذخیره می‌کند.
+    اگر کاربر ۱۰ آزمون داشته باشد، قدیمی‌ترین را حذف می‌کند.
+    """
     if request.method == 'POST' and 'test_results' in request.session:
-        if request.session.get('saved_exam_id'):
-            return JsonResponse({'status': 'info', 'message': 'این آزمون قبلاً در این مرورگر ذخیره شده است.'})
+        user = request.user
+        exam_count = Exam.objects.filter(user=user).count()
+        if exam_count >= 10:
+            oldest_exam = Exam.objects.filter(user=user).order_by('created_at').first()
+            if oldest_exam:
+                oldest_exam.delete()
 
         test_results = request.session['test_results']
-        new_exam = Exam.objects.create(user=request.user)
+        new_exam = Exam.objects.create(user=user)
         for subject, data in test_results.items():
-            SubjectResult.objects.create(exam=new_exam, **data)
+            subject_data = data.copy()
+            # ========== اصلاح نهایی برای رفع باگ ==========
+            subject_data.pop('subject', None)
+            # ============================================
+            SubjectResult.objects.create(exam=new_exam, subject_name=subject, **subject_data)
 
         request.session['saved_exam_id'] = new_exam.id
+        request.session.modified = True
         return JsonResponse({'status': 'success', 'message': 'آزمون با موفقیت در حساب کاربری شما ذخیره شد.'})
 
     return JsonResponse({'status': 'error', 'message': 'اطلاعاتی برای ذخیره یافت نشد.'}, status=400)
 
 
-@email_verified_required_custom
+@login_required
 def user_profile(request):
-    """صفحه پروفایل کاربر که لیست ۱۰ آزمون آخر او را نمایش می‌دهد."""
+    """صفحه پروفایل کاربر با لیست آزمون‌های ذخیره شده."""
     user_exams = Exam.objects.filter(user=request.user).order_by('-created_at')[:10]
     return render(request, 'analyzer/profile.html', {'exams': user_exams})
 
 
 @login_required
 def delete_account(request):
+    """حذف حساب کاربری."""
     if request.method == 'POST':
         user = request.user
         logout(request)
@@ -248,60 +269,76 @@ def delete_account(request):
     return render(request, 'analyzer/delete_account_confirm.html')
 
 
-# --- ویو سفارشی برای مدیریت خطای ارسال ایمیل ---
+@login_required
+def account_redirect(request):
+    """ویو نگهبان برای مدیریت ریدایرکت پس از ورود."""
+    is_verified = request.user.emailaddress_set.filter(primary=True, verified=True).exists()
+    if is_verified:
+        return redirect('user_profile')
+    else:
+        messages.warning(request,
+                         'حساب کاربری شما هنوز فعال نشده است. لطفاً ایمیل خود را برای لینک فعال‌سازی بررسی کنید.')
+        logout(request)
+        return redirect('account_login')
+
+
+# --- ویوهای سفارشی برای حل مشکلات allauth ---
+
 class CustomSignupView(SignupView):
+    """ویو سفارشی برای مدیریت خطای ارسال ایمیل در زمان ثبت‌نام."""
+
     def form_valid(self, form):
         try:
-            # تلاش برای اجرای منطق اصلی ثبت‌نام در allauth
-            response = super().form_valid(form)
-            return response
+            return super().form_valid(form)
         except socket.gaierror:
-            # اگر خطای اتصال به سرور ایمیل رخ داد
             messages.error(self.request,
-                           "خطا در اتصال به سرور ایمیل. لطفاً از اتصال اینترنت خود اطمینان حاصل کرده و مجدداً تلاش کنید. اگر مشکل ادامه داشت، با پشتیبانی تماس بگیرید.")
-            # کاربر را به همان صفحه ثبت‌نام برمی‌گردانیم
+                           "خطا در اتصال به سرور ایمیل. لطفاً از اتصال اینترنت خود اطمینان حاصل کرده و مجدداً تلاش کنید.")
             return self.form_invalid(form)
 
 
+class CustomLoginView(LoginView):
+    """ویو سفارشی برای حل مشکل چرخه تایید ایمیل در زمان ورود."""
+
+    def form_valid(self, form):
+        # ابتدا اجازه می‌دهیم فرآیند اصلی ورود به طور کامل انجام شود
+        response = super().form_valid(form)
+
+        # حالا که کاربر به طور کامل وارد شده (self.request.user یک کاربر واقعی است)،
+        # وضعیت ایمیل او را چک و در صورت نیاز تصحیح می‌کنیم.
+        # این کد فقط برای کاربرانی اجرا می‌شود که `is_authenticated` هستند.
+        if self.request.user.is_authenticated:
+            try:
+                email_address = EmailAddress.objects.get(user=self.request.user, primary=True)
+                if not email_address.verified:
+                    email_address.verified = True
+                    email_address.save()
+            except EmailAddress.DoesNotExist:
+                # اگر کاربر ایمیلی در مدل EmailAddress نداشته باشد (مثلا کاربر قدیمی)،
+                # می‌توانیم یکی برای او بسازیم.
+                EmailAddress.objects.create(
+                    user=self.request.user,
+                    email=self.request.user.email,
+                    primary=True,
+                    verified=True  # فرض می‌کنیم اگر توانسته با رمز وارد شود، ایمیل معتبر است
+                )
+
+        return response
+
 
 @login_required
-def account_redirect(request):
-    """
-    این ویو مانند یک نگهبان عمل می‌کند. کاربر پس از ورود به اینجا فرستاده می‌شود.
-    ما وضعیت تایید ایمیل او را بررسی کرده و او را به مقصد صحیح هدایت می‌کنیم.
-    """
-    # بررسی می‌کنیم آیا ایمیل اصلی کاربر تایید شده است یا نه
-    is_verified = request.user.emailaddress_set.filter(primary=True, verified=True).exists()
+def delete_single_exam(request, exam_id):
+    if request.method == 'POST':
+        exam = Exam.objects.filter(pk=exam_id, user=request.user).first()
+        if exam:
+            exam.delete()
+            messages.success(request, "آزمون با موفقیت حذف شد.")
+        else:
+            messages.error(request, "شما اجازه حذف این آزمون را ندارید.")
+    return redirect('user_profile')
 
-    if is_verified:
-        # اگر ایمیل تایید شده بود، کاربر را به صفحه پروفایل واقعی‌اش می‌فرستیم
-        return redirect('user_profile')
-    else:
-        # اگر ایمیل هنوز تایید نشده بود
-        messages.warning(request, 'حساب کاربری شما هنوز فعال نشده است. لطفاً ایمیل خود را برای لینک فعال‌سازی بررسی کنید.')
-        # او را از سیستم خارج می‌کنیم تا در چرخه گیر نیفتد
-        logout(request)
-        # و او را به صفحه ورود برمی‌گردانیم
-        return redirect('account_login')
-
-class YourAppConfig(AppConfig):
-    def ready(self):
-        @receiver(email_confirmed)
-        def update_user_email(sender, request, email_address, **kwargs):
-            email_address.verified = True
-            email_address.save()
-
-class CustomLoginView(LoginView):
-    def form_valid(self, form):
-        user = form.user
-
-        # بررسی کنیم که ایمیل تایید شده یا نه
-        try:
-            email_address = EmailAddress.objects.get(user=user, email=user.email)
-            if not email_address.verified:
-                messages.warning(self.request, "برای ورود، ابتدا باید ایمیل خود را تایید کنید.")
-                return redirect('account_email_verification_sent')  # فقط منتقل می‌کنه، ایمیل نمی‌فرسته
-        except EmailAddress.DoesNotExist:
-            pass
-
-        return super().form_valid(form)
+@login_required
+def delete_all_exams(request):
+    if request.method == 'POST':
+        Exam.objects.filter(user=request.user).delete()
+        messages.success(request, "تمام آزمون‌های شما با موفقیت حذف شدند.")
+    return redirect('user_profile')

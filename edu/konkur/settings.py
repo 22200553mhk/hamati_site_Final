@@ -18,7 +18,7 @@ MICROSOFT_CLIENT_ID_VAR = os.getenv('MICROSOFT_CLIENT_ID')
 MICROSOFT_CLIENT_SECRET_VAR = os.getenv('MICROSOFT_CLIENT_SECRET')
 # --------------------------------------
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'planikaa.ir', '185.231.112.23', 'www.planikaa.ir']
 
@@ -154,4 +154,8 @@ SOCIALACCOUNT_PROVIDERS = {
 SOCIALACCOUNT_ADAPTER = "analyzer.adapters.MySocialAccountAdapter"
 
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
