@@ -92,11 +92,26 @@
                         <a class="nav-link" href="{% url 'account_login' %}">ورود / ثبت نام</a>
                     </li>
                 {% endif %}
+                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dashboard' %}">تحلیل آزمون</a>
+                 </li>
             </ul>
         </div>
     </div>
    </nav>
 
+    <div class="container">
+        {% if messages %}
+            <div class="messages mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
     <main>
         {% block content %}
         {% endblock %}
@@ -104,7 +119,7 @@
 
     <footer class="mt-auto">
         <div class="container">
-            <p class="mb-0">© {% now "Y" %} | تمامی حقوق برای تحلیلگر کنکور محفوظ است.</p>
+            <p class="mb-0">© {% now "Y" %} | تمامی حقوق برای  پلنیکا محفوظ است.</p>
         </div>
     </footer>
 

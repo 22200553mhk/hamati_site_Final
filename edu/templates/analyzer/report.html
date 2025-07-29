@@ -1,8 +1,8 @@
 {% extends 'analyzer/base.html' %}
-{% load json_script %}
 {% block content %}
 
 <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0/dist/chartjs-plugin-annotation.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -79,6 +79,13 @@
     page-break-before: always;
     background-color: white;
   }
+
+  /* ========== کد جدید برای حل مشکل صفحه خالی PDF ========== */
+  .subject-section:last-of-type {
+    page-break-before: auto;
+  }
+  /* ======================================================== */
+
   .subject-header {
     display: flex;
     justify-content: space-between;
@@ -121,7 +128,9 @@
 <div id="report-page">
 
   <div class="no-print" style="text-align:center; margin-bottom: 20px;">
-    <button class="button" onclick="generatePDF()">📄 دانلود PDF</button>
+    {% if user.is_authenticated %}
+        <button class="button" onclick="generatePDF()">📄 دانلود PDF</button>
+    {% endif %}
     <a href="{% url 'dashboard' %}" class="button back">بازگشت به داشبورد</a>
     <span id="loading" style="display:none;">در حال تولید PDF...</span>
   </div>
@@ -182,38 +191,47 @@
   </div>
   {% endfor %}
 
+  {% if user.is_authenticated %}
+  <div class="subject-section user-section">
+    <h2 style="margin-bottom: 20px;">ویژه شما (کاربر وارد شده)</h2>
+    <div class="no-print text-center mb-4">
+        <button id="save-exam-btn" class="button" {% if is_exam_saved %}disabled{% endif %}>
+            {% if is_exam_saved %}آزمون ذخیره شده است{% else %}ذخیره این آزمون در پروفایل{% endif %}
+        </button>
+    </div>
+    {% if historical_feedback %}
+    <div class="historical-feedback">
+        <h4><i class="bi bi-graph-up"></i> تحلیل روند عملکرد شما</h4>
+        {% for item in historical_feedback %}
+            <div class="tip">• {{ item|safe }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
 </div>
 
-<!-- ارسال داده‌ها به جاوااسکریپت به صورت امن -->
-{{ subjects|json_script:"subjects-data" }}
-{{ percentages|json_script:"percentages-data" }}
+{{ subjects_list|json_script:"chart-labels" }}
+{{ percentages_list|json_script:"chart-percentages" }}
 
 <script>
   async function generatePDF() {
+    const userSection = document.querySelector('.user-section');
+    if (userSection) {
+        userSection.style.display = 'none'; // بخش ویژه کاربر را مخفی کن
+    }
+
     document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
     document.getElementById('loading').style.display = 'inline-block';
 
+    const element = document.getElementById('report-page');
     const opt = {
       margin: 0.5,
       filename: 'گزارش_تحلیلی_آزمون.pdf',
-      html2canvas: {
-        scale: 1.3,
-        useCORS: true,
-        letterRendering: true,
-        dpi: 192,
-        backgroundColor: null,
-        scrollY: 0,
-        fontFamily: "'Vazirmatn', Tahoma, sans-serif"
-      },
-      jsPDF: {
-        unit: 'in',
-        format: 'a4',
-        orientation: 'portrait',
-        hotfixes: ["px_scaling"]
-      }
+      html2canvas: { scale: 1.3, useCORS: true, letterRendering: true, dpi: 192, backgroundColor: null, scrollY: 0, fontFamily: "'Vazirmatn', Tahoma, sans-serif" },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait', hotfixes: ["px_scaling"] }
     };
-
-    const element = document.getElementById('report-page');
 
     try {
       await html2pdf().set(opt).from(element).save();
@@ -221,69 +239,122 @@
       console.error('خطا در تولید PDF:', e);
     }
 
+    // بخش ویژه کاربر را دوباره نمایش بده
+    if (userSection) {
+        userSection.style.display = 'block';
+    }
     document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
     document.getElementById('loading').style.display = 'none';
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    Chart.register(window['chartjs-plugin-annotation']);
-    const ctx = document.getElementById('barChart').getContext('2d');
+    // ادغام دو event listener در یکی
+    const labelsElement = document.getElementById('chart-labels');
+    const dataElement = document.getElementById('chart-percentages');
 
-    const colors = ['#4361ee', '#3dd598', '#ffc542', '#ff6b6b', '#5c7cfa', '#20c997', '#fab005', '#f03e3e'];
-    const labels = JSON.parse(document.getElementById('subjects-data').textContent);
-    const data = JSON.parse(document.getElementById('percentages-data').textContent);
-    const bgColors = labels.map((_, i) => colors[i % colors.length]);
+    if (labelsElement && dataElement) {
+        const labels = JSON.parse(labelsElement.textContent);
+        const data = JSON.parse(dataElement.textContent);
 
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'درصد',
-          data: data,
-          backgroundColor: bgColors,
-          borderColor: bgColors,
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: false,
-        maintainAspectRatio: true,
-        scales: {
-          y: {
-            beginAtZero: false,
-            suggestedMin: -30,
-            suggestedMax: 100,
-            ticks: {
-              callback: v => v + '%'
-            },
-            grid: {
-              color: 'rgba(0,0,0,0.1)'
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            }
-          }
-        },
-        plugins: {
-          legend: { display: false },
-          annotation: {
-            annotations: {
-              zeroLine: {
-                type: 'line',
-                yMin: 0,
-                yMax: 0,
-                borderColor: 'red',
-                borderWidth: 2,
-                borderDash: [6, 6]
+        if (Array.isArray(labels) && labels.length > 0) {
+            Chart.register(window['chartjs-plugin-annotation']);
+            const ctx = document.getElementById('barChart').getContext('2d');
+            const colors = ['#4361ee', '#3dd598', '#ffc542', '#ff6b6b', '#5c7cfa', '#20c997', '#fab005', '#f03e3e'];
+            const bgColors = labels.map((_, i) => colors[i % colors.length]);
+
+            new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: labels,
+                datasets: [{
+                  label: 'درصد',
+                  data: data,
+                  backgroundColor: bgColors,
+                  borderColor: bgColors,
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                responsive: false,
+                maintainAspectRatio: true,
+                scales: {
+                  y: {
+                    beginAtZero: false,
+                    suggestedMin: -30,
+                    suggestedMax: 100,
+                    ticks: { callback: v => v + '%' },
+                    grid: { color: 'rgba(0,0,0,0.1)' }
+                  },
+                  x: { grid: { display: false } }
+                },
+                plugins: {
+                  legend: { display: false },
+                  annotation: {
+                    annotations: {
+                      zeroLine: {
+                        type: 'line', yMin: 0, yMax: 0,
+                        borderColor: 'red', borderWidth: 2, borderDash: [6, 6]
+                      }
+                    }
+                  }
+                }
               }
-            }
-          }
+            });
         }
-      }
-    });
+    }
+
+    {% if user.is_authenticated %}
+    const saveBtn = document.getElementById('save-exam-btn');
+    if (saveBtn) {
+        // تابع نوتیفیکیشن را در اینجا تعریف می‌کنیم
+        function showNotification(message, type = 'success') {
+            const notificationArea = document.getElementById('notification-area') || document.body;
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show m-3`;
+            notification.style.position = 'fixed';
+            notification.style.bottom = '10px';
+            notification.style.right = '10px';
+            notification.style.zIndex = '1050';
+            notification.role = 'alert';
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i> ${message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
+            notificationArea.appendChild(notification);
+            setTimeout(() => { if(notification.parentNode) new bootstrap.Alert(notification).close() }, 5000);
+        }
+
+        saveBtn.addEventListener('click', function() {
+            const btn = this;
+            btn.disabled = true;
+            btn.textContent = 'در حال ذخیره...';
+
+            fetch("{% url 'save_exam_to_db' %}", {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                showNotification(data.message, data.status === 'success' ? 'success' : 'info');
+                if (data.status === 'success' || data.status === 'info') {
+                    btn.textContent = 'ذخیره شد';
+                } else {
+                    btn.textContent = 'خطا در ذخیره';
+                    btn.disabled = false;
+                }
+            })
+            .catch(error => {
+                // ========== بخش جدید برای حل مشکل دکمه ==========
+                console.error("Fetch Error:", error);
+                showNotification('یک خطای ناشناخته در ارتباط با سرور رخ داد.', 'danger');
+                btn.textContent = 'ذخیره این آزمون در پروفایل'; // متن دکمه را به حالت اولیه برگردان
+                btn.disabled = false; // دکمه را فعال کن
+                // ===============================================
+            });
+        });
+    }
+    {% endif %}
   });
 </script>
 

@@ -1,29 +1,53 @@
 {% extends 'analyzer/base.html' %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card mb-4" style="border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: none;">
-                <div class="card-body p-4 text-center">
-                    <h1 class="h3 mb-3">پروفایل کاربری</h1>
-                    <p class="text-muted">{{ user.email }}</p>
+            <div class="card mb-4 text-center">
+                <div class="card-body">
+                    <h1 class="h3">پروفایل کاربری</h1>
+                    <p class="h5 fw-normal mt-3">
+                        {% if user.first_name %}
+                            {{ user.first_name }}
+                        {% else %}
+                            {{ user.email }}
+                        {% endif %}
+                    </p>
+                    <p class="text-muted small">عضو از تاریخ: {{ user.date_joined|date:"Y/m/d" }}</p>
                 </div>
             </div>
 
-            <div class="card fade-in" style="border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: none;">
-                <div class="card-header bg-primary text-white" style="border-radius: 15px 15px 0 0;">
-                    <h3 class="mb-0" style="color: white !important;">آزمون‌های ذخیره شده</h3>
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0 h5" style="color: white !important;">آزمون‌های ذخیره شده</h3>
+                    {% if exams %}
+                        <form action="{% url 'delete_all_exams' %}" method="post" onsubmit="return confirm('آیا از حذف تمام آزمون‌ها مطمئن هستید؟');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-light">حذف همه</button>
+                        </form>
+                    {% endif %}
                 </div>
                 <div class="card-body p-4">
                     {% for exam in exams %}
                         <div class="card mb-3">
                             <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0 fw-normal">آزمون در تاریخ: {{ exam.created_at|date:"Y/m/d - H:i" }}</h5>
-                                <span class="badge bg-primary rounded-pill fs-6">میانگin کل: {{ exam.get_average_percentage|floatformat:1 }}%</span>
+                                <div>
+                                    <h5 class="mb-0 fw-normal small">آزمون در تاریخ: {{ exam.created_at|date:"Y/m/d - H:i" }}</h5>
+                                </div>
+                                <div>
+                                    <span class="badge bg-primary rounded-pill">میانگین کل: {{ exam.get_average_percentage|floatformat:1 }}%</span>
+                                    <form action="{% url 'delete_single_exam' exam.id %}" method="post" class="d-inline" onsubmit="return confirm('آیا از حذف این آزمون مطمئن هستید؟');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger ms-2">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body py-2">
                                 <ul class="list-group list-group-flush">
                                     {% for subject in exam.subjects.all %}
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -39,11 +63,15 @@
                             شما هنوز هیچ آزمونی را ذخیره نکرده‌اید.
                         </div>
                     {% endfor %}
+                </div>
+            </div>
 
-                    <hr class="my-4">
-                    <div class="text-center">
-                        <a href="{% url 'delete_account' %}" class="btn btn-danger">حذف حساب کاربری</a>
-                    </div>
+            <div class="card mt-4">
+                 <div class="card-header">
+                    <h3 class="mb-0 h5">تنظیمات حساب کاربری</h3>
+                </div>
+                <div class="card-body text-center">
+                     <a href="{% url 'delete_account' %}" class="btn btn-danger">حذف کامل حساب کاربری</a>
                 </div>
             </div>
         </div>
