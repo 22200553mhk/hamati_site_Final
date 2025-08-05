@@ -9,7 +9,8 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
 
     # سایر آدرس‌های شما بدون تغییر
-    path('save-result/', views.save_result, name='save_result'),
+    path('save-all-results/', views.save_all_results, name='save_all_results'),
+
     path('report/', views.generate_report, name='generate_report'),
     path('profile/', views.user_profile, name='user_profile'),
     path('save-exam/', views.save_exam_to_db, name='save_exam_to_db'),

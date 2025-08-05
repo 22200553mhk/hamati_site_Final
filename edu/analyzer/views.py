@@ -6,8 +6,6 @@ from .models import Exam, SubjectResult
 import json
 import jdatetime
 from django.contrib.auth import logout
-
-# ایمپورت‌های جدید و کامل شده
 import socket
 from django.contrib import messages
 from allauth.account.views import SignupView, LoginView
@@ -129,45 +127,9 @@ def dashboard(request):
     request.session.modified = True
     return render(request, 'analyzer/dashboard.html')
 
+# views.py
 
-@csrf_exempt
-def save_result(request):
-    """نتایج آزمون را از کاربر دریافت، پردازش و در سشن ذخیره می‌کند."""
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            correct = int(data.get('correct', 0))
-            wrong = int(data.get('wrong', 0))
-            total = int(data.get('total', 0))
-            study_hours = float(data.get('study_hours', 0))
-            practice = int(data.get('practice', 0))
-            data['percentage'] = calculate_percentage(correct, wrong, total)
-            data['blank'] = total - (correct + wrong)
-            risk_management = (1 - (wrong / (total - data['blank']))) * 100 if (total - data['blank']) > 0 else 0
-            denominator_ae = correct + wrong + (data['blank'] * 0.3)
-            answering_efficiency = (correct / denominator_ae) * 100 if denominator_ae > 0 else 0
-            study_productivity = (data['percentage'] / study_hours) * 10 if study_hours > 0 else 0
-            practice_effectiveness = (data['percentage'] / practice) * 100 if practice > 0 else 0
-            denominator_tue = study_hours + (practice / 20)
-            time_utilization = (data['percentage'] / denominator_tue) * 10 if denominator_tue > 0 else 0
-            data.update({
-                'risk_management': round(risk_management, 1),
-                'answering_efficiency': round(answering_efficiency, 1),
-                'study_productivity': round(study_productivity, 1),
-                'practice_effectiveness': round(practice_effectiveness, 1),
-                'time_utilization': round(time_utilization, 1)
-            })
-            if 'test_results' not in request.session:
-                request.session['test_results'] = {}
-            subject = data.get('subject', 'درس نامشخص')
-            request.session['test_results'][subject] = data
-            request.session.modified = True
-            return JsonResponse(
-                {'status': 'success', 'message': f'اطلاعات درس <strong>{subject}</strong> با موفقیت ثبت شد.'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': f'خطا: {e}'}, status=400)
-    return JsonResponse({'status': 'error', 'message': 'متد درخواست نامعتبر است'}, status=400)
-
+# views.py
 
 def generate_historical_feedback(user, current_results_dict):
     """تحلیل اختصاصی برای کاربر لاگین کرده با مقایسه ۱۰ آزمون قبلی."""
@@ -175,31 +137,29 @@ def generate_historical_feedback(user, current_results_dict):
     previous_exams = Exam.objects.filter(user=user).prefetch_related('subjects').order_by('-created_at')[:10]
 
     if not previous_exams:
-        feedback.append(
-            "این اولین آزمونی است که ذخیره می‌کنید. برای دریافت تحلیل روند، آزمون‌های بعدی خود را نیز ذخیره کنید.")
+        feedback.append("این اولین آزمونی است که ذخیره می‌کنید. برای دریافت تحلیل روند، آزمون‌های بعدی خود را نیز ذخیره کنید.")
         return feedback
 
-    # ========== قوانین جدید شما (قوانین ۱۸ و ۱۹) ==========
     for subject_name, current_data in current_results_dict.items():
-        past_percentages = [res.percentage for exam in previous_exams for res in exam.subjects.all() if
-                            res.subject_name == subject_name]
+        past_percentages = [res.percentage for exam in previous_exams for res in exam.subjects.all() if res.subject_name.strip() == subject_name.strip()]
 
         if len(past_percentages) >= 2:
             avg_past = sum(past_percentages) / len(past_percentages)
             current_percentage = current_data['percentage']
 
-            # قانون ۱۸: افت شدید
-            if current_percentage < avg_past - 20:  # افت بیش از ۲۰ درصد
+            # --- بخش اصلاح شده ---
+            if current_percentage < avg_past - 20:
                 feedback.append(
-                    f"درس {subject_name} با افت شدید مواجه شده! درصد شما از حدود {avg_past:.0f}٪ به {current_percentage:.0f}٪ رسیده. این یک هشدار جدیه! بررسی کن: منبع عوض کردی؟ خسته‌ای؟ تمرکز نداری؟ ریشه رو پیدا کن و برگرد بالا.")
-
-            # قانون ۱۹: رشد سریع
-            elif current_percentage > avg_past + 20:  # رشد بیش از ۲۰ درصد
+                    f"درس {subject_name} با افت شدید مواجه شده! درصد شما از حدود {avg_past:.0f}٪ به {current_percentage:.0f}٪ رسیده. این یک هشدار جدیه! ریشه رو پیدا کن و برگرد بالا.")
+            elif current_percentage > avg_past + 20:
                 feedback.append(
                     f"در درس {subject_name} رشد سریع و عالی داشتی! عالیه. همین روال رو ادامه بده، اما حواست باشه غرور تو دامته. هفته آینده فقط مرور کن، نه پرکاری.")
-
+            else:
+                # این حالت جدید اضافه شد تا عملکرد پایدار را پوشش دهد
+                feedback.append(
+                    f"عملکرد شما در درس {subject_name} با درصد {current_percentage:.0f}٪، نسبت به میانگین قبل ({avg_past:.0f}٪) پایدار و ثابت بوده است. این روند خوب را حفظ کنید.")
+            # --- پایان بخش اصلاح شده ---
     return feedback
-
 
 def generate_report(request):
     """گزارش نهایی را با آماده‌سازی داده‌ها برای قالب HTML رندر می‌کند."""
@@ -207,14 +167,22 @@ def generate_report(request):
     if not test_results:
         messages.warning(request, "هیچ داده‌ای برای نمایش گزارش یافت نشد. لطفاً ابتدا اطلاعات آزمون را وارد کنید.")
         return redirect('dashboard')
+
     report_items = []
-    for subject, data in test_results.items():
-        report_items.append(
-            {'subject_name': subject, 'subject_data': data, 'feedback': generate_subject_feedback(subject, data)})
+    # --- بخش اصلاح شده ---
+    # از enumerate برای گرفتن شماره ردیف (i) استفاده می‌کنیم
+    for i, (subject, data) in enumerate(test_results.items()):
+        report_items.append({
+            'subject_name': subject,
+            'subject_data': data,
+            'feedback': generate_subject_feedback(subject, data),
+            'chart_id': i  # <<<<<< شماره ردیف به عنوان ID اضافه شد
+        })
+    # --- پایان بخش اصلاح شده ---
+
     num_subjects = len(test_results)
     avg_percentage = sum(d['percentage'] for d in test_results.values()) / num_subjects if num_subjects > 0 else 0
 
-    # ========== قانون جدید شما (قانون ۱۶) ==========
     historical_feedback = []
     if num_subjects > 1:
         percentages = [d['percentage'] for d in test_results.values()]
@@ -226,8 +194,24 @@ def generate_report(request):
         historical_feedback.extend(generate_historical_feedback(request.user, test_results))
         exam_id = request.session.get('saved_exam_id')
         is_exam_saved = exam_id and Exam.objects.filter(id=exam_id, user=request.user).exists()
+
+        # --- بخش اصلاح شده ---
+        # اگر کاربر لاگین کرده ولی هیچ فیدبک تاریخی وجود ندارد، یک پیام پیش‌فرض اضافه کن
+        if not historical_feedback:
+            historical_feedback.append(
+                "در حال حاضر تحلیلی برای روند عملکرد شما وجود ندارد. آزمون‌های بعدی خود را ذخیره کنید.")
+        # --- پایان بخش اصلاح شده ---
+
     else:
         is_exam_saved = False
+
+    # ... a few lines before the context dictionary ...
+    if request.user.is_authenticated:
+        print(f"--- DEBUGGING FOR USER: {request.user.username} ---")
+        previous_exams_count = Exam.objects.filter(user=request.user).count()
+        print(f"FOUND {previous_exams_count} PREVIOUS EXAMS IN DATABASE.")
+        print(f"CONTENT OF historical_feedback: {historical_feedback}")
+        print("-----------------------------------------")
 
     context = {
         'report_items': report_items,
@@ -235,6 +219,7 @@ def generate_report(request):
         'avg_percentage': f"{avg_percentage:.1f}",
         'total_questions': sum(d['total'] for d in test_results.values()),
         'total_correct': sum(d['correct'] for d in test_results.values()),
+        'total_wrong': sum(d['wrong'] for d in test_results.values()),  # اطمینان از وجود این خط
         'subjects_list': list(test_results.keys()),
         'percentages_list': [d['percentage'] for d in test_results.values()],
         'historical_feedback': historical_feedback,
@@ -354,3 +339,56 @@ def delete_all_exams(request):
         Exam.objects.filter(user=request.user).delete()
         messages.success(request, "تمام آزمون‌های شما با موفقیت حذف شدند.")
     return redirect('user_profile')
+
+
+def save_all_results(request):
+    """نتایج تمام دروس را در یک درخواست واحد دریافت و در سشن ذخیره می‌کند."""
+    if request.method == 'POST':
+        try:
+            # پاک کردن نتایج قبلی برای شروع یک آزمون جدید
+            if 'test_results' in request.session:
+                del request.session['test_results']
+            if 'saved_exam_id' in request.session:
+                del request.session['saved_exam_id']
+
+            list_of_results = json.loads(request.body)
+            processed_results = {}
+
+            for data in list_of_results:
+                correct = int(data.get('correct', 0))
+                wrong = int(data.get('wrong', 0))
+                total = int(data.get('total', 0))
+                study_hours = float(data.get('study_hours', 0))
+                practice = int(data.get('practice', 0))
+
+                # انجام محاسبات دقیقا مانند ویو قبلی شما
+                data['percentage'] = calculate_percentage(correct, wrong, total)
+                data['blank'] = total - (correct + wrong)
+                risk_management = (1 - (wrong / (total - data['blank']))) * 100 if (total - data['blank']) > 0 else 0
+                denominator_ae = correct + wrong + (data['blank'] * 0.3)
+                answering_efficiency = (correct / denominator_ae) * 100 if denominator_ae > 0 else 0
+                study_productivity = (data['percentage'] / study_hours) * 10 if study_hours > 0 else 0
+                practice_effectiveness = (data['percentage'] / practice) * 100 if practice > 0 else 0
+                denominator_tue = study_hours + (practice / 20)
+                time_utilization = (data['percentage'] / denominator_tue) * 10 if denominator_tue > 0 else 0
+
+                data.update({
+                    'risk_management': round(risk_management, 1),
+                    'answering_efficiency': round(answering_efficiency, 1),
+                    'study_productivity': round(study_productivity, 1),
+                    'practice_effectiveness': round(practice_effectiveness, 1),
+                    'time_utilization': round(time_utilization, 1)
+                })
+
+                subject_name = data.get('subject', 'درس نامشخص')
+                processed_results[subject_name] = data
+
+            # ذخیره دیکشنری کامل در سشن
+            request.session['test_results'] = processed_results
+            request.session.modified = True
+
+            return JsonResponse(
+                {'status': 'success', 'message': f'اطلاعات تمام دروس با موفقیت ثبت شد.'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'خطا: {e}'}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'متد درخواست نامعتبر است'}, status=400)
