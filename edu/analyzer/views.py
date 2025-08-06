@@ -127,9 +127,6 @@ def dashboard(request):
     request.session.modified = True
     return render(request, 'analyzer/dashboard.html')
 
-# views.py
-
-# views.py
 
 def generate_historical_feedback(user, current_results_dict):
     """تحلیل اختصاصی برای کاربر لاگین کرده با مقایسه ۱۰ آزمون قبلی."""
@@ -147,7 +144,6 @@ def generate_historical_feedback(user, current_results_dict):
             avg_past = sum(past_percentages) / len(past_percentages)
             current_percentage = current_data['percentage']
 
-            # --- بخش اصلاح شده ---
             if current_percentage < avg_past - 20:
                 feedback.append(
                     f"درس {subject_name} با افت شدید مواجه شده! درصد شما از حدود {avg_past:.0f}٪ به {current_percentage:.0f}٪ رسیده. این یک هشدار جدیه! ریشه رو پیدا کن و برگرد بالا.")
@@ -155,12 +151,104 @@ def generate_historical_feedback(user, current_results_dict):
                 feedback.append(
                     f"در درس {subject_name} رشد سریع و عالی داشتی! عالیه. همین روال رو ادامه بده، اما حواست باشه غرور تو دامته. هفته آینده فقط مرور کن، نه پرکاری.")
             else:
-                # این حالت جدید اضافه شد تا عملکرد پایدار را پوشش دهد
                 feedback.append(
                     f"عملکرد شما در درس {subject_name} با درصد {current_percentage:.0f}٪، نسبت به میانگین قبل ({avg_past:.0f}٪) پایدار و ثابت بوده است. این روند خوب را حفظ کنید.")
-            # --- پایان بخش اصلاح شده ---
     return feedback
 
+
+# ===================================================================
+# تابع جدید برای تولید توصیه‌های تکمیلی
+# ===================================================================
+def generate_complementary_feedback(test_results):
+    """
+    بر اساس قوانین جدید ارائه شده، بازخوردهای تکمیلی تولید می‌کند.
+    """
+    feedback = {}
+    percentages = {name: data['percentage'] for name, data in test_results.items()}
+    # نرمال‌سازی نام دروس برای هماهنگی با قوانین
+    normalized_percentages = {
+        'ریاضی': percentages.get('ریاضی'),
+        'فیزیک': percentages.get('فیزیک'),
+        'شیمی': percentages.get('شیمی'),
+        'زیست': percentages.get('زیست‌شناسی') # تبدیل 'زیست‌شناسی' در برنامه به 'زیست' در قوانین
+    }
+    # حذف دروسی که در آزمون نبوده‌اند
+    normalized_percentages = {k: v for k, v in normalized_percentages.items() if v is not None}
+
+    if len(normalized_percentages) < 4:
+        # اکثر قوانین برای ۴ درس طراحی شده‌اند، در غیر این صورت تابع خاتمه می‌یابد
+        return {}
+
+    p = normalized_percentages
+    all_perc = list(p.values())
+
+    # === دسته ۱: تحلیل زوج درس‌ها ===
+    cat1_feedback = []
+    # حالت ۱: ریاضی قوی، فیزیک ضعیف
+    if p.get('ریاضی', 0) > 90 and p.get('فیزیک', 100) < 50:
+        cat1_feedback.append("<strong>تحلیل زوج ریاضی-فیزیک:</strong> توانایی محاسباتی‌ات خوبه، ولی توی فیزیک، درک مفاهیم دچار مشکل شده. باید تمرکزت رو روی حل مسئله‌های مفهومی و تحلیل دقیق فرمول‌ها بذاری.")
+    # حالت ۲: فیزیک قوی، ریاضی ضعیف
+    elif p.get('فیزیک', 0) > 90 and p.get('ریاضی', 100) < 50:
+        cat1_feedback.append("<strong>تحلیل زوج فیزیک-ریاضی:</strong> در فیزیک عالی عمل کردی که نشون می‌ده قدرت تحلیل داری، ولی ریاضی پایه‌ات نیاز به بازسازی داره. باید با تمرین منظم از مفاهیم پایه‌ای شروع کنی، بعدش هم بری سراغ تست های محاسباتی فیزیک.")
+
+    # حالت ۳: زیست قوی، شیمی ضعیف
+    if p.get('زیست', 0) > 90 and p.get('شیمی', 100) < 50:
+        cat1_feedback.append("<strong>تحلیل زوج زیست-شیمی:</strong> زیست رو خوب درک می‌کنی، ولی شیمی نیاز به تحلیل و ساختار داره. با آموزش تصویری و تمرین‌های گام‌به‌گام، شیمی رو مفهومی یاد بگیر.")
+    # حالت ۴: شیمی قوی، زیست ضعیف
+    elif p.get('شیمی', 0) > 90 and p.get('زیست', 100) < 50:
+        cat1_feedback.append("<strong>تحلیل زوج شیمی-زیست:</strong> تحلیلت در شیمی عالیه، ولی زیست‌خوانی‌ات نیاز به تحول داره. باید مطالب زیست رو مفهومی و با نگاه ترکیبی یاد بگیری، نه فقط حفظ کنی.")
+
+    if cat1_feedback:
+        feedback["تحلیل زوج درس‌ها"] = cat1_feedback
+
+    # === دسته ۲: تحلیل تک‌درس ضعیف ===
+    cat2_feedback = []
+    others_strong = lambda s: all(perc >= 70 for name, perc in p.items() if name != s)
+    if p.get('فیزیک', 100) < 40 and others_strong('فیزیک'):
+        cat2_feedback.append("<strong>ضعف در فیزیک:</strong> با وجود تسلط خوب در اکثر دروس، فیزیک ضعف چشم‌گیری داره. این ضعف ممکنه به دلیل نداشتن پایه یا بی‌توجهی باشه. توصیه میشه با معلم خصوصی یا منابع مفهومی شروع به ترمیم این ضعف کنی.")
+    elif p.get('ریاضی', 100) < 40 and others_strong('ریاضی'):
+        cat2_feedback.append("<strong>ضعف در ریاضی:</strong> عملکرد خوبی در دروس دیگه داری، اما ریاضی نیاز به بازسازی پایه‌ای یا تمرین بیشتر داره. با تمرین مداوم و یادگیری تدریجی مباحث پایه، می‌تونی این ضعف رو جبران کنی.")
+    elif p.get('زیست', 100) < 40 and others_strong('زیست'):
+        cat2_feedback.append("<strong>ضعف در زیست:</strong> با اینکه در بقیه دروس موفق بودی، اما زیست که درس رتبه‌سازه، نقطه ضعف مهمیه. زیست رو باید مفهومی‌تر و با برنامه‌ریزی ترکیبی یاد بگیری.")
+    elif p.get('شیمی', 100) < 40 and others_strong('شیمی'):
+        cat2_feedback.append("<strong>ضعف در شیمی:</strong> شیمی نقطه ضعف فعلیته، و این ضعف می‌تونه به خاطر گیج شدن بین مباحث حفظی و مفهومی باشه. با دسته‌بندی مطالب و مرور موضوعی می‌تونی وضعیتت رو بهتر کنی.")
+
+    if cat2_feedback:
+        feedback["تحلیل نقاط ضعف آشکار"] = cat2_feedback
+
+    # === دسته ۳ و ۴: تحلیل کلی عملکرد ===
+    cat3_4_feedback = []
+    # دسته ۳ - حالت ۱
+    if all(perc < 30 for perc in all_perc):
+        cat3_4_feedback.append("<strong>تحلیل کلی:</strong> ضعف کامل یا شروع‌نشده. الان باید هدف کوتاه‌مدتت فقط ایجاد عادت مطالعه باشه، نه تسلط. از پایه‌ترین منابع شروع کن.")
+    # دسته ۳ - حالت ۲ (متن دقیق‌تر از دسته ۴ برداشته شد)
+    elif all(30 <= perc < 50 for perc in all_perc):
+        cat3_4_feedback.append("<strong>تحلیل کلی:</strong> آشنایی نسبی با مباحث داری ولی در اجرای اون‌ها ضعف داری. اولویتت باید مرور مفاهیم پایه و حل سوالات ساده تا متوسط باشه. مسیر موفقیت برای تو، ترکیبی از ثبات مطالعه، پیوستگی مرور، و مدیریت هدفمند منابع هستش.")
+    # دسته ۳ - حالت ۳
+    elif sum(p < 30 for p in all_perc) == 3 and sum(50 <= p < 60 for p in all_perc) == 1:
+        cat3_4_feedback.append("<strong>تحلیل کلی:</strong> یک درس را به عنوان نقطه قوت حفظ کن و از اون برای بالا کشیدن بقیه استفاده کن. برای سه درس ضعیف، مطالعه پایه‌ای و برای درس قوی‌تر، تمرین بیشتر توصیه می‌شه.")
+    # دسته ۴ - حالت ۱
+    elif all(50 <= perc < 70 for perc in all_perc):
+        cat3_4_feedback.append("<strong>تحلیل کلی:</strong> پایه‌ات شکل گرفته ولی عمق یادگیری و تسلط کافی نداری. تمرکزت رو روی تثبیت مطالب و ارتقای تدریجی مهارت تست‌زنی بذار. سراغ فصل‌های کلیدی برو و تلاش کن قدم ‌به ‌قدم وارد محدوده ۷۰٪ به بالا بشی.")
+    # دسته ۴ - حالت ۲
+    elif all(70 <= perc < 90 for perc in all_perc):
+        cat3_4_feedback.append("<strong>تحلیل کلی:</strong> از مطالعه مفهومی عبور کردی و باید وارد فضای رقابتی بشی. کیفیت خیلی مهمتر از کمیته. تمرکزت رو بذار روی تست‌های سخت‌تر و چالش برانگیز.")
+    # دسته ۴ - حالت ۴
+    elif sum(70 <= p < 90 for p in all_perc) == 2 and sum(50 <= p < 70 for p in all_perc) == 2:
+        cat3_4_feedback.append("<strong>تحلیل کلی:</strong> وضعیتت خیلی خوبه و تعادل نسبی داری. درس‌های قوی‌تر رو با تست‌های چالشی حفظ کن و درس‌های متوسط رو با تقویت پایه به سطح بالاتر برسون. حفظ تعادل، کلید موفقیت توئه.")
+    # دسته ۴ - حالت ۵
+    elif sum(p >= 90 for p in all_perc) == 1 and sum(50 <= p < 90 for p in all_perc) == 3:
+        cat3_4_feedback.append("<strong>تحلیل کلی:</strong> یک نقطه قوت بزرگ داری که باید حفظش کنی. موفقیت در کنکور با 'تعادل' به‌دست میاد. از اعتماد‌به‌نفس این درس قوی استفاده کن و بقیه دروس رو هم گام ‌به ‌گام بالا بیار.")
+
+    if cat3_4_feedback:
+        feedback["تحلیل سطح عملکرد کلی"] = cat3_4_feedback
+
+    return feedback
+
+
+# ===================================================================
+# تابع اصلی گزارش که اصلاح شده است
+# ===================================================================
 def generate_report(request):
     """گزارش نهایی را با آماده‌سازی داده‌ها برای قالب HTML رندر می‌کند."""
     test_results = request.session.get('test_results', {})
@@ -169,21 +257,20 @@ def generate_report(request):
         return redirect('dashboard')
 
     report_items = []
-    # --- بخش اصلاح شده ---
-    # از enumerate برای گرفتن شماره ردیف (i) استفاده می‌کنیم
     for i, (subject, data) in enumerate(test_results.items()):
         report_items.append({
             'subject_name': subject,
             'subject_data': data,
             'feedback': generate_subject_feedback(subject, data),
-            'chart_id': i  # <<<<<< شماره ردیف به عنوان ID اضافه شد
+            'chart_id': i
         })
-    # --- پایان بخش اصلاح شده ---
 
     num_subjects = len(test_results)
     avg_percentage = sum(d['percentage'] for d in test_results.values()) / num_subjects if num_subjects > 0 else 0
 
     historical_feedback = []
+    complementary_feedback = {} # <<<< مقداردهی اولیه دیکشنری بازخورد جدید
+
     if num_subjects > 1:
         percentages = [d['percentage'] for d in test_results.values()]
         if max(percentages) - min(percentages) > 50:
@@ -192,26 +279,16 @@ def generate_report(request):
 
     if request.user.is_authenticated:
         historical_feedback.extend(generate_historical_feedback(request.user, test_results))
+        complementary_feedback = generate_complementary_feedback(test_results) # <<<< فراخوانی تابع جدید
+
         exam_id = request.session.get('saved_exam_id')
         is_exam_saved = exam_id and Exam.objects.filter(id=exam_id, user=request.user).exists()
 
-        # --- بخش اصلاح شده ---
-        # اگر کاربر لاگین کرده ولی هیچ فیدبک تاریخی وجود ندارد، یک پیام پیش‌فرض اضافه کن
         if not historical_feedback:
             historical_feedback.append(
                 "در حال حاضر تحلیلی برای روند عملکرد شما وجود ندارد. آزمون‌های بعدی خود را ذخیره کنید.")
-        # --- پایان بخش اصلاح شده ---
-
     else:
         is_exam_saved = False
-
-    # ... a few lines before the context dictionary ...
-    if request.user.is_authenticated:
-        print(f"--- DEBUGGING FOR USER: {request.user.username} ---")
-        previous_exams_count = Exam.objects.filter(user=request.user).count()
-        print(f"FOUND {previous_exams_count} PREVIOUS EXAMS IN DATABASE.")
-        print(f"CONTENT OF historical_feedback: {historical_feedback}")
-        print("-----------------------------------------")
 
     context = {
         'report_items': report_items,
@@ -219,10 +296,11 @@ def generate_report(request):
         'avg_percentage': f"{avg_percentage:.1f}",
         'total_questions': sum(d['total'] for d in test_results.values()),
         'total_correct': sum(d['correct'] for d in test_results.values()),
-        'total_wrong': sum(d['wrong'] for d in test_results.values()),  # اطمینان از وجود این خط
+        'total_wrong': sum(d['wrong'] for d in test_results.values()),
         'subjects_list': list(test_results.keys()),
         'percentages_list': [d['percentage'] for d in test_results.values()],
         'historical_feedback': historical_feedback,
+        'complementary_feedback': complementary_feedback, # <<<< ارسال به context
         'is_exam_saved': is_exam_saved,
     }
     return render(request, 'analyzer/report.html', context)
@@ -361,7 +439,6 @@ def save_all_results(request):
                 study_hours = float(data.get('study_hours', 0))
                 practice = int(data.get('practice', 0))
 
-                # انجام محاسبات دقیقا مانند ویو قبلی شما
                 data['percentage'] = calculate_percentage(correct, wrong, total)
                 data['blank'] = total - (correct + wrong)
                 risk_management = (1 - (wrong / (total - data['blank']))) * 100 if (total - data['blank']) > 0 else 0
@@ -383,7 +460,6 @@ def save_all_results(request):
                 subject_name = data.get('subject', 'درس نامشخص')
                 processed_results[subject_name] = data
 
-            # ذخیره دیکشنری کامل در سشن
             request.session['test_results'] = processed_results
             request.session.modified = True
 

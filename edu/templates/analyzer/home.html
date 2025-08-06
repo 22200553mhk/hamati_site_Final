@@ -3,46 +3,44 @@
 
 {% block content %}
 <style>
-    /* حذف حاشیه‌های پیش‌فرض */
     body, html {
         margin: 0;
         padding: 0;
         font-family: 'Vazirmatn', sans-serif;
-        overflow-x: hidden; /* جلوگیری از اسکرول افقی */
+        overflow-x: hidden;
     }
 
-    /* کانتینر اصلی صفحه */
     .hero-container {
         position: relative;
         width: 100%;
-        height: 100vh; /* ارتفاع کامل صفحه نمایش */
+        min-height: 100vh;
         background-color: #ffffff;
         display: flex;
         flex-direction: column;
     }
 
-    /* بخش بالایی (سبزآبی) */
     .hero-top {
         position: relative;
-        background-color: #2a9d8f; /* رنگ سبزآبی از طرح */
-        flex-grow: 1; /* این بخش را بزرگ می‌کند */
+        background-color: #2a9d8f;
+        flex-grow: 1;
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 2rem;
-        overflow: hidden; /* بسیار مهم برای کنترل SVG */
-        z-index: 2
+        overflow: hidden;
+        z-index: 2;
     }
 
-    /* محتوای بخش بالایی */
     .hero-content {
         display: flex;
         align-items: center;
         justify-content: space-around;
         width: 100%;
         max-width: 1100px;
-        z-index: 2; /* بالاتر از منحنی SVG قرار می‌گیرد */
+        flex-wrap: wrap;
+        z-index: 2;
+        gap: 2rem;
     }
 
     .hero-text h1 {
@@ -51,13 +49,10 @@
         font-weight: bold;
         text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
         line-height: 1.4;
+        margin: 0;
     }
 
     .hero-logo-placeholder {
-        position: absolute;
-        top: 40%; /* موقعیت عمودی، کمی پایین‌تر از مرکز */
-        left: 80%;
-        transform: translate(-50%, -50%); /* مرکزیت دقیق */
         width: 180px;
         height: 180px;
         background-color: #D2F3FF;
@@ -74,29 +69,26 @@
         height: auto;
     }
 
-    /* استایل SVG */
     .hero-wave-svg {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1;
-    height: 400px; /* با این خط ارتفاع منحنی را کنترل می‌کنیم */
-}
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 400px;
+        z-index: 1;
+    }
 
-
-    /* بخش پایینی (سفید) */
     .hero-bottom {
         background-color: #ffffff;
-        min-height: 300px; /* حداقل ارتفاع برای نمایش دکمه */
+        min-height: 300px;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
-        padding-top: 10px; /* ایجاد فاصله از منحنی */
+        padding: 2rem;
+        box-sizing: border-box;
     }
 
-    /* دکمه فراخوان به عمل */
     .cta-button {
         background-color: #1F5C72;
         color: white;
@@ -108,48 +100,80 @@
         box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         transition: all 0.3s ease;
         z-index: 2;
+        text-align: center;
     }
 
     .cta-button:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        color:white;
+        color: white;
     }
 
-    /* عناصر تزئینی */
     .deco-shape {
-    position: absolute;
-    font-size: 2rem;
-    font-weight: bold;
-    user-select: none;
-    z-index: 1;
-}
+        position: absolute;
+        font-size: 2rem;
+        font-weight: bold;
+        user-select: none;
+        z-index: 1;
+        color: #e0e0e0;
+    }
 
-.shape-1, .shape-2 {
-    color: white; /* رنگ سفید برای ضربدرهای بخش سبزآبی */
-}
+    .shape-1, .shape-2 { color: white; }
+    .shape-3, .shape-4, .shape-5 { color: black; }
+
     .shape-1 { top: 10%; left: 15%; }
-    .shape-2 { top: 5%; left:70%; font-size: 3rem; }
+    .shape-2 { top: 5%; left: 70%; font-size: 3rem; }
     .shape-3 { bottom: 2%; left: 20%; }
     .shape-4 { bottom: 25%; right: 15%; font-size: 2.5rem; }
     .shape-5 { top: 2%; left: 20%; font-size: 1.5rem; }
 
-
-    /* ریسپانسیو برای موبایل */
     @media (max-width: 768px) {
+        .hero-top {
+            flex-grow: 0;
+            padding-bottom: 120px;
+        }
+
         .hero-content {
             flex-direction: column;
-            gap: 40px;
-        }
-        .hero-text h1 {
-            font-size: 2rem;
+            gap: 20px;
+            padding-top: 40px;
             text-align: center;
         }
-        .hero-wave-svg {
-            height: 100px; /* تنظیم ارتفاع SVG در موبایل برای نمایش بهتر */
+
+        .hero-text h1 {
+            font-size: 2.2rem;
+            line-height: 1.5;
         }
+
+        .hero-logo-placeholder {
+            order: -1;
+            position: relative;
+            top: auto;
+            left: auto;
+            transform: none;
+            margin: 0 auto;
+            width: 140px;
+            height: 140px;
+        }
+
+        .hero-wave-svg {
+            height: 150px;
+        }
+
         .hero-bottom {
-            padding-top: 50px;
+            flex-grow: 1;
+            min-height: auto;
+            padding-top: 20px;
+            align-items: flex-start;
+        }
+
+        .cta-button {
+            font-size: 1rem;
+            padding: 14px 28px;
+        }
+
+        .deco-shape {
+            display: none;
         }
     }
 </style>
@@ -160,27 +184,26 @@
         <span class="deco-shape shape-2">×<br>×<br>×</span>
 
         <div class="hero-content">
-    <div class="hero-logo-placeholder">
-    <img src="{% static 'images/logo.png' %}" alt="لوگوی سایت">
-</div>
+            <div class="hero-logo-placeholder">
+                <img src="{% static 'images/logo.png' %}" alt="لوگوی سایت">
+            </div>
 
-    <div class="hero-text">
-        <h1>یه تحلیل خوب<br>بعد از یه آزمون سخت</h1>
-    </div>
-</div>
+            <div class="hero-text">
+                <h1>یه تحلیل خوب<br>بعد از یه آزمون سخت</h1>
+            </div>
+        </div>
 
-       <svg class="hero-wave-svg" viewBox="0 0 1440 517" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-    <path d="M0 5.00015C0 5.00015 575.5 679 992 308C1408.5 -63 1440 5.00015 1440 5.00015V517H0V5.00015Z" fill="white"/>
-</svg>
+        <svg class="hero-wave-svg" viewBox="0 0 1440 517" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0 5.00015C0 5.00015 575.5 679 992 308C1408.5 -63 1440 5.00015 1440 5.00015V517H0V5.00015Z" fill="white"/>
+        </svg>
     </section>
 
     <section class="hero-bottom">
-    <span class="deco-shape shape-3">×<br>×</span>
-    <span class="deco-shape shape-4">×<br>×<br>×</span>
+        <span class="deco-shape shape-3">×<br>×</span>
+        <span class="deco-shape shape-4">×<br>×<br>×</span>
+        <span class="deco-shape shape-5">× × ×</span>
 
-    <span class="deco-shape shape-5">× × ×</span>
-    <a href="{% url 'dashboard' %}" class="cta-button">برای شروع تحلیل کلیک کنید</a>
-</section>
-
+        <a href="{% url 'dashboard' %}" class="cta-button">برای شروع تحلیل کلیک کنید</a>
+    </section>
 </div>
 {% endblock %}
