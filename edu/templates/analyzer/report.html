@@ -1,11 +1,6 @@
 {% extends 'analyzer/base.html' %}
 {% block content %}
 
-<div class="background-decor no-print">
-    <div class="shape shape-1"></div>
-    <div class="shape shape-2"></div>
-    <div class="shape shape-3"></div>
-</div>
 <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0/dist/chartjs-plugin-annotation.min.js"></script>
@@ -13,251 +8,191 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-/* START: استایل‌های جدید برای پس‌زمینه تزیینی */
-.background-decor {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
-    pointer-events: none;
-}
-.shape {
-    position: absolute;
-    filter: blur(100px);
-    opacity: 0.5;
-}
-.shape-1 {
-    width: 450px;
-    height: 450px;
-    background: rgba(42, 157, 143, 0.15);
-    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-    top: -100px;
-    right: -150px;
-    animation: moveShape 25s infinite alternate ease-in-out;
-}
-.shape-2 {
-    width: 400px;
-    height: 400px;
-    background: rgba(231, 111, 81, 0.1);
-    border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%;
-    bottom: -120px;
-    left: -100px;
-    animation: moveShape 30s infinite alternate-reverse ease-in-out;
-}
-.shape-3 {
-    width: 300px;
-    height: 300px;
-    background: rgba(123, 29, 162, 0.08);
-    border-radius: 50%;
-    bottom: 30%;
-    right: 5%;
-    animation: moveShape 35s infinite alternate ease-in-out;
-    filter: blur(120px);
-}
+  body {
+    font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+    direction: rtl;
+    color: #333;
+    background-color: #f4f7f9;
+    background-image: repeating-linear-gradient(45deg, #eaf0f4 25%, transparent 25%, transparent 75%, #eaf0f4 75%, #eaf0f4),
+                      repeating-linear-gradient(-45deg, #eaf0f4 25%, transparent 25%, transparent 75%, #eaf0f4 75%, #eaf0f4);
+    background-size: 60px 60px;
+  }
+  #report-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  .report-actions { text-align: center; margin-bottom: 30px; }
+  .btn-action-new { background: linear-gradient(145deg, #26a39a, #26c485); color: white; padding: 12px 30px; margin: 0 8px; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 1rem; font-weight: bold; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); transition: transform 0.2s; }
+  .btn-action-new:hover { transform: translateY(-2px); }
+  .summary-grid-new { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 40px; }
+  .summary-box-new { background-color: #2a9d8f; color: white; border-radius: 30px 15px 15px 15px; padding: 25px 20px; text-align: center; }
+  .chart-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 40px; position: relative; }
+  #barChartWrapper { width: 100%; height: 400px; position: relative; }
+  #barChart { width: 100% !important; height: 100% !important; }
 
-@keyframes moveShape {
-    from {
-        transform: rotate(0deg) scale(1) translateX(0px) translateY(0px);
-    }
-    to {
-        transform: rotate(180deg) scale(1.1) translateX(30px) translateY(20px);
-    }
-}
-/* END: استایل‌های جدید */
-
-body { font-family: 'Vazirmatn', Tahoma, sans-serif !important; direction: rtl; background-color: #f0f2f5; color: #333; }
-#report-container { max-width: 900px; margin: 20px auto; padding: 20px; position: relative; z-index: 1; }
-.report-actions { text-align: center; margin-bottom: 30px; }
-.btn-action-new { background: linear-gradient(145deg, #26a39a, #26c485); color: white; padding: 12px 30px; margin: 0 8px; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 1rem; font-weight: bold; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
-.summary-grid-new { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 40px; }
-.summary-box-new { background-color: #2a9d8f; color: white; border-radius: 30px 15px 15px 15px; padding: 25px 20px; text-align: center; }
-.chart-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 40px; position: relative; }
-
-#barChartWrapper { width: 100%; height: 400px; position: relative; }
-#barChart { width: 100% !important; height: 100% !important; }
-
-.subject-card-final {
+  .subject-card-final {
     color: white; border-radius: 20px; padding: 25px; margin-bottom: 30px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-}
-.subject-card-final.green { background: linear-gradient(to bottom, #66bb6a, #2e7d32); }
-.subject-card-final.orange { background: linear-gradient(to bottom, #ffa726, #e65100); }
-.subject-card-final.purple { background: linear-gradient(to bottom, #ab47bc, #6a1b9a); }
-.subject-card-final.red { background: linear-gradient(to bottom, #ef5350, #b71c1c); }
+  }
+  .subject-card-final.green { background: linear-gradient(to bottom, #66bb6a, #2e7d32); }
+  .subject-card-final.orange { background: linear-gradient(to bottom, #ffa726, #e65100); }
+  .subject-card-final.purple { background: linear-gradient(to bottom, #ab47bc, #6a1b9a); }
+  .subject-card-final.red { background: linear-gradient(to bottom, #ef5350, #b71c1c); }
+  .card-top-section { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+  .card-main-content { flex-grow: 1; }
+  .card-header-final { display: flex; align-items: center; justify-content: flex-start; gap: 15px; margin-bottom: 5px; }
+  .card-header-final h3 { font-size: 1.8rem; font-weight: bold; margin: 0; color: #ffffff;}
+  .card-header-final .stats-icon { font-size: 1.8rem; }
+  .donut-chart-wrapper { width: 150px; height: 150px; position: relative; }
+  .donut-percentage-final { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 25px; font-weight: bold; }
+  .stats-table-final { width: 100%; border-collapse: collapse; text-align: right; }
+  .stats-table-final th { background: rgba(0,0,0,0.2); padding: 8px; }
+  .stats-table-final td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.2); }
+  .stats-table-final tr:last-child td { border-bottom: none; }
+  .recommendations-final h4 { font-size: 1.8rem; margin-top: 25px; margin-bottom: 15px; color: #ffffff; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.2); }
 
-.card-top-section { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
-.card-main-content { flex-grow: 1; }
-.card-header-final { display: flex; align-items: center; justify-content: flex-start; gap: 15px; margin-bottom: 5px; }
-.card-header-final h3 { font-size: 1.8rem; font-weight: bold; margin: 0; color: #ffffff;}
-.card-header-final .stats-icon { font-size: 1.8rem; }
-
-.donut-chart-wrapper { width: 150px; height: 150px; position: relative; }
-.donut-percentage-final { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 25px; font-weight: bold; }
-
-.stats-table-final { width: 100%; border-collapse: collapse; text-align: right; }
-.stats-table-final th { background: rgba(0,0,0,0.2); padding: 8px; }
-.stats-table-final td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.2); }
-.stats-table-final tr:last-child td { border-bottom: none; }
-
-.recommendations-final h4 { font-size: 1.8rem; margin-top: 25px; margin-bottom: 15px; color: #ffffff; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.2); }
-
-.feedback-box-final {
+  .feedback-box-final {
     background: #e9ecef; color: #212529; border-radius: 25px 8px 8px 25px;
     padding: 15px 20px; margin-bottom: 10px; text-align: right;
     box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1);
-}
-.feedback-box-final.green { border: 2px solid #2e7d32; }
-.feedback-box-final.orange { border: 2px solid #e65100; }
-.feedback-box-final.purple { border: 2px solid #6a1b9a; }
-.feedback-box-final.red { border: 2px solid #b71c1c; }
-.feedback-box-final.blue { border: 2px solid #007bff; }
+  }
+  .feedback-box-final.green { border: 2px solid #2e7d32; }
+  .feedback-box-final.orange { border: 2px solid #e65100; }
+  .feedback-box-final.purple { border: 2px solid #6a1b9a; }
+  .feedback-box-final.red { border: 2px solid #b71c1c; }
+  .feedback-box-final.blue { border: 2px solid #007bff; }
 
-.user-section { background: #fff; border: 1px solid #e0e6ff; border-radius: 12px; padding: 25px; margin-top: 30px; }
-#save-exam-btn { background: #28a745; color: white; padding: 10px 25px; margin: 0 5px; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; font-size: 1rem; font-weight: 500; }
-#save-exam-btn:disabled { background: #6c757d; cursor: not-allowed; }
+  .user-section { background: #fff; border: 1px solid #e0e6ff; border-radius: 12px; padding: 25px; margin-top: 30px; }
+  #save-exam-btn:disabled { background: #6c757d; cursor: not-allowed; }
+  .accordion-item { background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+  .accordion-header { display: block; width: 100%; padding: 15px 20px; cursor: pointer; background-color: #e9ecef; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; text-align: right; font-size: 1.1rem; position: relative; }
+  .accordion-header::before { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; left: 20px; top: 50%; transform: translateY(-50%) rotate(0deg); transition: transform 0.3s ease-in-out; }
+  .accordion-item[open] > .accordion-header::before { transform: translateY(-50%) rotate(-180deg); }
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
 
-.complementary-feedback-container { margin-top: 25px; }
-.accordion-item {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    overflow: hidden;
-}
-.accordion-header {
-    display: block;
-    width: 100%;
-    padding: 15px 20px;
-    cursor: pointer;
-    background-color: #e9ecef;
-    border-bottom: 1px solid #dee2e6;
-    font-weight: bold;
-    color: #495057;
-    text-align: right;
-    font-size: 1.1rem;
-    position: relative;
-    transition: background-color 0.3s;
-}
-.accordion-header:hover { background-color: #dde2e6; }
-.accordion-header::before {
-    content: '\f078';
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%) rotate(0deg);
-    transition: transform 0.3s ease-in-out;
-}
-.accordion-item[open] > .accordion-header::before {
-    transform: translateY(-50%) rotate(-180deg);
-}
-.accordion-body { padding: 5px 20px 20px 20px; }
+  /* استایل برای ساختار جایگزین کرکره در PDF */
+  .pdf-accordion-replacement {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+  }
+  .pdf-accordion-replacement .accordion-header {
+      border-bottom: 1px solid #dee2e6;
+  }
 
-details > summary { list-style: none; }
-details > summary::-webkit-details-marker { display: none; }
-
-@media print {
-    body { background-color: white !important; }
-    .no-print { display: none !important; }
-    #report-container { max-width: 100%; margin: 0; padding: 10px; box-shadow: none; }
-    .subject-card-final { break-inside: avoid; box-shadow: none; }
-    .feedback-box-final { break-inside: avoid; }
-    #barChartWrapper { height: 300px !important; }
-}
+  @media print {
+    body { background: white !important; }
+    #report-container { box-shadow: none; border: none; margin: 0; padding: 10px; max-width: 100%;}
+    .no-print, .no-print-specific { display: none !important; }
+    .user-section, .subject-card-final, .pdf-accordion-replacement {
+        page-break-inside: avoid !important;
+    }
+  }
 </style>
 
 <div id="report-page">
 <div id="report-container">
-    <div style="text-align: center;">
+
+  <div class="summary-section">
+      <div style="text-align: center;">
         <h1 style="color: #2a9d8f; font-weight: bold; margin-bottom: 20px;">گزارش تحلیلی آزمون</h1>
         <div class="report-actions no-print">
-            <a href="{% url 'dashboard' %}" class="btn-action-new">بازگشت به داشبورد</a>
-            {% if user.is_authenticated %}
-                <button class="btn-action-new" onclick="generatePDF()">دریافت PDF</button>
-                <span id="loading" style="display:none; color: #e76f51;">در حال تولید PDF...</span>
-            {% endif %}
+          <a href="{% url 'dashboard' %}" class="btn-action-new">بازگشت به داشبورد</a>
+          {% if user.is_authenticated %}
+            <button class="btn-action-new" onclick="generatePDF()">دریافت PDF</button>
+            <span id="loading" style="display:none; color: #e76f51;">در حال تولید PDF...</span>
+          {% endif %}
         </div>
         <h2 style="color: #2a9d8f; text-align: right; margin-top: 40px; margin-bottom: 15px; padding-right: 10px;">خلاصه نتایج آزمون‌ها</h2>
-    </div>
-    <div class="summary-grid-new">
+      </div>
+      <div class="summary-grid-new">
         <div class="summary-box-new"><div class="label">تعداد دروس:</div><div class="value">{{ report_items|length }}</div></div>
         <div class="summary-box-new"><div class="label">میانگین درصد:</div><div class="value">{{ avg_percentage }}%</div></div>
         <div class="summary-box-new"><div class="label">تعداد سوالات:</div><div class="value">{{ total_questions }}</div></div>
         <div class="summary-box-new"><div class="label">پاسخ صحیح:</div><div class="value">{{ total_correct }}</div></div>
-    </div>
-    <div class="chart-container">
+      </div>
+
+      <div class="chart-container">
         <h3 style="text-align: center; margin-bottom: 20px; color: #2a9d8f;">نمودار مقایسه درصد دروس</h3>
         <div id="barChartWrapper">
-            <canvas id="barChart"></canvas>
+          <canvas id="barChart"></canvas>
         </div>
+      </div>
+  </div>
+
+  {% for item in report_items %}
+    <div class="subject-card-final {% if item.subject_name == 'ریاضی' %}red{% elif item.subject_name == 'شیمی' %}purple{% elif item.subject_name == 'فیزیک' %}orange{% else %}green{% endif %}">
+      <div class="card-top-section">
+          <div class="card-main-content">
+              <div class="card-header-final">
+                  <h3>تحلیل تفصیلی درس {{ item.subject_name }}</h3>
+                  <i class="stats-icon fa-solid {% if item.subject_name == 'ریاضی' %}fa-calculator{% elif item.subject_name == 'شیمی' %}fa-flask-vial{% elif item.subject_name == 'فیزیک' %}fa-atom{% else %}fa-dna{% endif %}"></i>
+              </div>
+              <table class="stats-table-final">
+                  <tr><th>مورد</th><th>مقدار</th></tr>
+                  <tr><td>تعداد کل سوالات</td><td>{{ item.subject_data.total }}</td></tr>
+                  <tr><td>پاسخ صحیح</td><td>{{ item.subject_data.correct }}</td></tr>
+                  <tr><td>پاسخ غلط</td><td>{{ item.subject_data.wrong }}</td></tr>
+                  <tr><td>بدون پاسخ</td><td>{{ item.subject_data.blank }}</td></tr>
+              </table>
+          </div>
+          <div class="donut-chart-wrapper">
+              <canvas id="donut-{{ item.chart_id }}"></canvas>
+              <div class="donut-percentage-final">{{ item.subject_data.percentage }}%</div>
+          </div>
+      </div>
+      <div class="recommendations-final">
+          <h4>توصیه‌ها</h4>
+          {% for feedback in item.feedback %}
+              <div class="feedback-box-final {% if item.subject_name == 'ریاضی' %}red{% elif item.subject_name == 'شیمی' %}purple{% elif item.subject_name == 'فیزیک' %}orange{% else %}green{% endif %}">{{ feedback|safe }}</div>
+          {% endfor %}
+      </div>
     </div>
-    {% for item in report_items %}
-    <div class="subject-card-final {% if item.subject_name == 'زیست‌شناسی' %}green{% elif item.subject_name == 'فیزیک' %}orange{% elif item.subject_name == 'شیمی' %}purple{% elif item.subject_name == 'ریاضی' %}red{% endif %}">
-        <div class="card-top-section">
-            <div class="card-main-content">
-                <div class="card-header-final">
-                    <h3>تحلیل تفصیلی درس {{ item.subject_name }}</h3>
-                    <i class="stats-icon fa-solid {% if item.subject_name == 'زیست‌شناسی' %}fa-dna{% elif item.subject_name == 'فیزیک' %}fa-atom{% elif item.subject_name == 'شیمی' %}fa-flask-vial{% elif item.subject_name == 'ریاضی' %}fa-calculator{% endif %}"></i>
-                </div>
-                <table class="stats-table-final">
-                    <tr><th>مورد</th><th>مقدار</th></tr>
-                    <tr><td>تعداد کل سوالات</td><td>{{ item.subject_data.total }}</td></tr>
-                    <tr><td>پاسخ صحیح</td><td>{{ item.subject_data.correct }}</td></tr>
-                    <tr><td>پاسخ غلط</td><td>{{ item.subject_data.wrong }}</td></tr>
-                    <tr><td>بدون پاسخ</td><td>{{ item.subject_data.blank }}</td></tr>
-                </table>
-            </div>
-            <div class="donut-chart-wrapper">
-                <canvas id="donut-{{ item.chart_id }}"></canvas>
-                <div class="donut-percentage-final">{{ item.subject_data.percentage }}%</div>
-            </div>
-        </div>
-        <div class="recommendations-final">
-            <h4>توصیه‌ها</h4>
-            {% for feedback in item.feedback %}
-                <div class="feedback-box-final {% if item.subject_name == 'زیست‌شناسی' %}green{% elif item.subject_name == 'فیزیک' %}orange{% elif item.subject_name == 'شیمی' %}purple{% elif item.subject_name == 'ریاضی' %}red{% endif %}">{{ feedback|safe }}</div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endfor %}
-    {% if user.is_authenticated %}
-    <div class="user-section no-print">
-        <h3 style="text-align: center; margin-bottom: 20px;">تحلیل اختصاصی و ذخیره آزمون</h3>
-        <div class="report-actions no-print">
-            <button id="save-exam-btn" class="btn-action-new" {% if is_exam_saved %}disabled{% endif %}>
-                {% if is_exam_saved %}آزمون ذخیره شده است{% else %}ذخیره این آزمون در پروفایل{% endif %}
-            </button>
-        </div>
-        {% if historical_feedback %}
+  {% endfor %}
+
+  {% if user.is_authenticated %}
+    <div class="user-section">
+      <h3 style="text-align: center; margin-bottom: 20px;" class="no-print-specific">تحلیل اختصاصی و ذخیره آزمون</h3>
+      <div class="report-actions no-print-specific">
+        <button id="save-exam-btn" class="btn-action-new" {% if is_exam_saved %}disabled{% endif %}>
+          {% if is_exam_saved %}آزمون قبلاً ذخیره شده{% else %}ذخیره این آزمون در پروفایل{% endif %}
+        </button>
+      </div>
+
+      {% if historical_feedback %}
         <div class="historical-feedback">
-            <h4 style="text-align: right; margin: 20px 0 15px;"><i class="fa-solid fa-chart-line"></i> تحلیل روند عملکرد شما</h4>
-            {% for item in historical_feedback %}
+          <h4 style="text-align: right; margin: 20px 0 15px;"><i class="fa-solid fa-chart-line"></i> تحلیل روند عملکرد شما</h4>
+          {% for item in historical_feedback %}
             <div class="feedback-box-final blue">{{ item|safe }}</div>
-            {% endfor %}
+          {% endfor %}
         </div>
-        {% endif %}
-        {% if complementary_feedback %}
+      {% endif %}
+
+      {% if complementary_feedback %}
         <div class="complementary-feedback-container">
-            <h4 style="text-align: right; margin: 20px 0 15px;"><i class="fa-solid fa-microscope"></i> توصیه‌های تکمیلی بر اساس قوانین</h4>
-            {% for category, feedbacks in complementary_feedback.items %}
-            <details class="accordion-item">
-                <summary class="accordion-header">{{ category }}</summary>
-                <div class="accordion-body">
-                    {% for feedback in feedbacks %}
-                    <div class="feedback-box-final blue" style="margin-top: 10px;">{{ feedback|safe }}</div>
-                    {% endfor %}
-                </div>
+          <h4 style="text-align: right; margin: 20px 0 15px;"><i class="fa-solid fa-microscope"></i> توصیه‌های تکمیلی بر اساس قوانین</h4>
+          {% for category, feedbacks in complementary_feedback.items %}
+            <details class="accordion-item recommendation-accordion" open>
+              <summary class="accordion-header">{{ category }}</summary>
+              <div class="accordion-body">
+                {% for feedback in feedbacks %}
+                  <div class="feedback-box-final blue" style="margin-top: 10px;">{{ feedback|safe }}</div>
+                {% endfor %}
+              </div>
             </details>
-            {% endfor %}
+          {% endfor %}
         </div>
-        {% endif %}
+      {% endif %}
     </div>
     <div id="notification-area" class="no-print"></div>
-    {% endif %}
+  {% endif %}
 </div>
 </div>
 
@@ -265,183 +200,223 @@ details > summary::-webkit-details-marker { display: none; }
 {{ subjects_list|json_script:"chart-labels" }}
 
 <script>
-function prepareChartsForPDF() {
-    if (window.barChartInstance) { window.barChartInstance.options.animation = false; }
-    if (window.donutChartInstances) { window.donutChartInstances.forEach(chart => { chart.options.animation = false; }); }
-}
-function restoreChartsState() {
-    if (window.barChartInstance) { window.barChartInstance.options.animation = true; }
-    if (window.donutChartInstances) { window.donutChartInstances.forEach(chart => { chart.options.animation = true; }); }
-}
-async function generatePDF() {
+  async function generatePDF() {
     const loadingEl = document.getElementById('loading');
-    if(loadingEl) loadingEl.style.display = 'inline-block';
     const elementsToHide = document.querySelectorAll('.no-print');
+
+    // آماده‌سازی صفحه برای ساخت PDF
     elementsToHide.forEach(el => el.style.display = 'none');
-    prepareChartsForPDF();
-    const element = document.getElementById('report-page');
-    const opt = {
-        margin: [10, 5, 10, 5],
-        filename: 'گزارش_تحلیلی_آزمون.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-            scale: 2, useCORS: true, letterRendering: true, dpi: 300, backgroundColor: '#FFFFFF',
+
+    // استراتژی جدید: جایگزینی موقت کرکره‌ها با div ساده
+    const accordions = document.querySelectorAll('.recommendation-accordion');
+    accordions.forEach(acc => {
+        const replacementDiv = document.createElement('div');
+        replacementDiv.classList.add('pdf-accordion-replacement');
+
+        const header = acc.querySelector('.accordion-header');
+        const body = acc.querySelector('.accordion-body');
+        if (header && body) {
+            const clonedHeader = header.cloneNode(true);
+            clonedHeader.querySelector('::before')?.remove(); // حذف فلش از نسخه کلون شده
+            replacementDiv.appendChild(clonedHeader);
+            replacementDiv.appendChild(body.cloneNode(true));
+        }
+        acc.style.display = 'none';
+        acc.parentNode.insertBefore(replacementDiv, acc.nextSibling);
+    });
+
+    if(loadingEl) loadingEl.style.display = 'inline-block';
+
+    try {
+        const element = document.getElementById('report-page');
+        const opt = {
+          margin: [10, 5, 10, 5],
+          filename: 'گزارش_تحلیلی_آزمون.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2, useCORS: true, letterRendering: true,
+            dpi: 300, backgroundColor: '#FFFFFF',
             onclone: (clonedDoc) => {
                 const container = clonedDoc.getElementById('report-container');
                 if (container) {
+                    container.style.marginTop = '0';
                     container.style.width = '100%';
                     container.style.maxWidth = '100%';
                 }
-                const barWrapper = clonedDoc.getElementById('barChartWrapper');
-                if (barWrapper) { barWrapper.style.height = '320px'; }
-                clonedDoc.body.style.fontFamily = "'Vazirmatn', Tahoma, sans-serif";
+                const elementsToRemove = clonedDoc.querySelectorAll('.no-print-specific');
+                elementsToRemove.forEach(el => el.remove());
             }
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', hotfixes: ["px_scaling"] },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    };
-    try {
-        await html2pdf().set(opt).from(element).toPdf().get('pdf').then(pdf => {
-            restoreChartsState();
-            elementsToHide.forEach(el => el.style.display = '');
-            if(loadingEl) loadingEl.style.display = 'none';
-            pdf.save();
-        });
+          },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: {
+              mode: ['css', 'manual'],
+              before: ['.subject-card-final', '.user-section']
+          }
+        };
+
+        await html2pdf().set(opt).from(element).save();
+
     } catch (e) {
         console.error('خطا در تولید PDF:', e);
-        if(loadingEl) loadingEl.textContent = 'خطا در تولید PDF!';
-        restoreChartsState();
+        if(loadingEl) {
+            loadingEl.textContent = 'خطا در تولید PDF!';
+            setTimeout(() => {
+                if(loadingEl) {
+                    loadingEl.style.display = 'none';
+                    loadingEl.textContent='در حال تولید PDF...';
+                }
+            }, 3000);
+        }
+    } finally {
+        // بازگرداندن صفحه به حالت اولیه
         elementsToHide.forEach(el => el.style.display = '');
-        setTimeout(() => { if(loadingEl) loadingEl.style.display = 'none'; }, 3000);
+        if(loadingEl) loadingEl.style.display = 'none';
+
+        // حذف divهای جایگزین و نمایش مجدد کرکره‌های اصلی
+        document.querySelectorAll('.pdf-accordion-replacement').forEach(rep => rep.remove());
+        accordions.forEach(acc => acc.style.display = '');
     }
-}
-window.addEventListener('load', () => {
+  }
+
+  window.addEventListener('load', () => {
     const labels = JSON.parse(document.getElementById('chart-labels').textContent);
     const reportItemsData = JSON.parse(document.getElementById('report-items-data').textContent);
     const percentages = reportItemsData.map(item => item.subject_data.percentage);
-    const barCtx = document.getElementById('barChart').getContext('2d');
-    const baseColors = { 'زیست‌شناسی': '#388e3c', 'فیزیک': '#f57c00', 'شیمی': '#7b1fa2', 'ریاضی': '#c62828' };
+    const barCtx = document.getElementById('barChart').getContext('2d', { willReadFrequently: true });
+
+    const baseColors = { 'ریاضی': '#c62828', 'شیمی': '#7b1fa2', 'فیزیک': '#f57c00', 'زیست‌شناسی': '#388e3c' };
+
     window.barChartInstance = new Chart(barCtx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'درصد',
-                data: percentages,
-                backgroundColor: context => {
-                    const {ctx, chartArea} = context.chart;
-                    if (!chartArea) { return null; }
-                    const subjectName = context.chart.data.labels[context.dataIndex];
-                    const color = baseColors[subjectName] || '#6c757d';
-                    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                    gradient.addColorStop(0, color);
-                    gradient.addColorStop(1, color + '80');
-                    return gradient;
-                },
-                borderColor: context => baseColors[context.chart.data.labels[context.dataIndex]] || '#6c757d',
-                borderWidth: 2, borderRadius: 8, borderSkipped: false,
-            }]
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'درصد',
+          data: percentages,
+          backgroundColor: context => {
+            const chart = context.chart;
+            const {ctx, chartArea} = chart;
+            if (!chartArea) { return null; }
+            const subjectName = context.chart.data.labels[context.dataIndex];
+            const color = baseColors[subjectName] || '#6c757d';
+            const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+            gradient.addColorStop(0, color);
+            gradient.addColorStop(1, color + '80');
+            return gradient;
+          },
+          borderColor: context => baseColors[context.chart.data.labels[context.dataIndex]] || '#6c757d',
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: false, suggestedMin: -33.3, suggestedMax: 100,
+            ticks: { callback: v => v + '%', font: { family: "'Vazirmatn', sans-serif" }, color: '#6c757d' },
+            grid: { color: '#e9ecef', borderDash: [5, 5] }
+          },
+          x: {
+            ticks: { font: { family: "'Vazirmatn', sans-serif", weight: 'bold' }, color: '#495057' },
+            grid: { display: false }
+          }
         },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: false, suggestedMin: -33, suggestedMax: 100,
-                    ticks: { callback: v => v + '%', font: { family: "'Vazirmatn', sans-serif" }, color: '#6c757d' },
-                    grid: { color: '#e9ecef', borderDash: [5, 5] }
-                },
-                x: {
-                    ticks: { font: { family: "'Vazirmatn', sans-serif", weight: 'bold' }, color: '#495057' },
-                    grid: { display: false }
-                }
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    enabled: true, backgroundColor: '#343a40',
-                    titleFont: { family: "'Vazirmatn', sans-serif", size: 14 },
-                    bodyFont: { family: "'Vazirmatn', sans-serif", size: 12 },
-                    padding: 10, cornerRadius: 5, displayColors: false,
-                    callbacks: { label: context => `درصد: ${context.formattedValue} ٪` }
-                },
-                annotation: {
-                    annotations: {
-                        zeroLine: { type: 'line', yMin: 0, yMax: 0, borderColor: '#e76f51', borderWidth: 2, borderDash: [6, 6], label: { enabled: false } }
-                    }
-                }
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: true, backgroundColor: '#343a40',
+            titleFont: { family: "'Vazirmatn', sans-serif", size: 14 },
+            bodyFont: { family: "'Vazirmatn', sans-serif", size: 12 },
+            padding: 10, cornerRadius: 5, displayColors: false,
+            callbacks: { label: context => `درصد: ${context.formattedValue} ٪` }
+          },
+          annotation: {
+            annotations: {
+              zeroLine: { type: 'line', yMin: 0, yMax: 0, borderColor: '#e76f51', borderWidth: 2, borderDash: [6, 6], label: { enabled: false } }
             }
+          }
         }
+      }
     });
+
     const donutGradients = {
         green: barCtx.createLinearGradient(0,0,0,150), orange: barCtx.createLinearGradient(0,0,0,150),
-        purple: barCtx.createLinearGradient(0,0,0,150), red: barCtx.createLinearGradient(0,0,0,150)
+        purple: barCtx.createLinearGradient(0,0,0,150), red: barCtx.createLinearGradient(0,0,0,150),
     };
     donutGradients.green.addColorStop(0, '#81c784'); donutGradients.green.addColorStop(1, '#388e3c');
     donutGradients.orange.addColorStop(0, '#ffb74d'); donutGradients.orange.addColorStop(1, '#f57c00');
     donutGradients.purple.addColorStop(0, '#ba68c8'); donutGradients.purple.addColorStop(1, '#7b1fa2');
     donutGradients.red.addColorStop(0, '#e57373'); donutGradients.red.addColorStop(1, '#c62828');
-    window.donutChartInstances = [];
+
     reportItemsData.forEach(item => {
-        const canvas = document.getElementById(`donut-${item.chart_id}`);
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        const percentage = item.subject_data.percentage;
-        let progressData, progressColors;
-        if (percentage < 0) {
-            progressData = [5, 95];
-            progressColors = ['#ff5252', 'rgba(0, 0, 0, 0.2)'];
-        } else {
-            const safePercentage = Math.min(100, percentage);
-            let colorClass;
-            if (item.subject_name === 'زیست‌شناسی') colorClass = 'green';
-            else if (item.subject_name === 'فیزیک') colorClass = 'orange';
-            else if (item.subject_name === 'شیمی') colorClass = 'purple';
-            else if (item.subject_name === 'ریاضی') colorClass = 'red';
-            progressData = [safePercentage, 100 - safePercentage];
-            progressColors = [donutGradients[colorClass], 'rgba(0, 0, 0, 0.2)'];
-        }
-        const donutChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: { datasets: [{ data: progressData, backgroundColor: progressColors, borderWidth: 0 }] },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
-        });
-        window.donutChartInstances.push(donutChart);
+      const canvas = document.getElementById(`donut-${item.chart_id}`);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const percentage = item.subject_data.percentage;
+      let progressData, progressColors;
+      if (percentage < 0) {
+        progressData = [5, 95];
+        progressColors = ['#ff5252', 'rgba(0, 0, 0, 0.2)'];
+      } else {
+        const safePercentage = Math.min(100, percentage);
+        let colorClass = 'green';
+        if (item.subject_name === 'ریاضی') colorClass = 'red';
+        else if (item.subject_name === 'شیمی') colorClass = 'purple';
+        else if (item.subject_name === 'فیزیک') colorClass = 'orange';
+        progressData = [safePercentage, 100 - safePercentage];
+        progressColors = [donutGradients[colorClass], 'rgba(0, 0, 0, 0.2)'];
+      }
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: { datasets: [{ data: progressData, backgroundColor: progressColors, borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+      });
     });
+
     {% if user.is_authenticated %}
     const saveBtn = document.getElementById('save-exam-btn');
     if (saveBtn) {
         saveBtn.addEventListener('click', function() {
             this.disabled = true; this.textContent = 'در حال ذخیره...';
             fetch("{% url 'save_exam_to_db' %}", {
-                method: 'POST',
-                headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' }
+              method: 'POST',
+              headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' }
             })
             .then(res => res.json())
             .then(data => {
                 showNotification(data.message, data.status === 'success' ? 'success' : 'danger');
-                if (data.status === 'success') { this.textContent = 'ذخیره شد'; this.disabled = true; }
-                else { this.disabled = false; this.textContent = 'ذخیره این آزمون در پروفایل'; }
+                if (data.status === 'success') {
+                    this.textContent = 'آزمون ذخیره شد';
+                    this.disabled = true;
+                } else {
+                    this.disabled = false;
+                    this.textContent = 'ذخیره این آزمون در پروفایل';
+                }
             })
             .catch(err => {
-                showNotification('خطا در ارتباط با سرور', 'danger');
+                showNotification('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.', 'danger');
                 this.disabled = false; this.textContent = 'ذخیره این آزمون در پروفایل';
             });
         });
     }
+
     function showNotification(message, type = 'success') {
         const area = document.getElementById('notification-area');
         if (!area) return;
         const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
         area.innerHTML = `
-            <div class="alert ${alertClass}" style="position:fixed; bottom:20px; right:20px; z-index:999; padding:15px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
-                <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-                ${message}
-            </div>
+          <div class="alert ${alertClass}" style="position:fixed; bottom:20px; right:20px; z-index:999; padding:15px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); background-color: ${type === 'success' ? '#28a745' : '#dc3545'}; color: white;">
+            <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            ${message}
+          </div>
         `;
         setTimeout(() => { area.innerHTML = ''; }, 5000);
     }
     {% endif %}
-});
+  });
 </script>
 
 {% endblock %}
