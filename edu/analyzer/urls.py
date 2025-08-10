@@ -18,4 +18,6 @@ urlpatterns = [
     path('profile/delete_exam/<int:exam_id>/', views.delete_single_exam, name='delete_single_exam'),
     path('profile/delete_all_exams/', views.delete_all_exams, name='delete_all_exams'),
     path('account/redirect/', views.account_redirect, name='account_redirect'),
+    path('check-username/', views.check_username, name='check_username'),
+    path('check-email/', views.check_email, name='check_email'),
 ]

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
+from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from .models import Exam, SubjectResult
@@ -10,6 +10,9 @@ import socket
 from django.contrib import messages
 from allauth.account.views import SignupView, LoginView
 from allauth.account.models import EmailAddress
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+
 
 
 def calculate_percentage(correct, wrong, total):
@@ -278,6 +281,7 @@ def generate_complementary_feedback(test_results):
 
 
 def generate_report(request):
+    today_shamsi = jdatetime.datetime.now().strftime("%Y/%m/%d")
     test_results = request.session.get('test_results', {})
     if not test_results:
         messages.warning(request, "هیچ داده‌ای برای نمایش گزارش یافت نشد. لطفاً ابتدا اطلاعات آزمون را وارد کنید.")
@@ -313,7 +317,7 @@ def generate_report(request):
 
     context = {
         'report_items': report_items,
-        'today_jalali_date': jdatetime.datetime.now().strftime("%Y/%m/%d"),
+        'today_shamsi': today_shamsi,
         'avg_percentage': f"{avg_percentage:.1f}",
         'total_questions': sum(d['total'] for d in test_results.values()),
         'total_correct': sum(d['correct'] for d in test_results.values()),
@@ -483,3 +487,15 @@ def save_all_results(request):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': f'خطا: {e}'}, status=400)
     return JsonResponse({'status': 'error', 'message': 'متد درخواست نامعتبر است'}, status=400)
+
+@require_GET
+def check_username(request):
+    username = request.GET.get('username', '').strip()
+    exists = User.objects.filter(username__iexact=username).exists()
+    return JsonResponse({'exists': exists})
+
+@require_GET
+def check_email(request):
+    email = request.GET.get('email', '').strip()
+    exists = User.objects.filter(email__iexact=email).exists()
+    return JsonResponse({'exists': exists})
