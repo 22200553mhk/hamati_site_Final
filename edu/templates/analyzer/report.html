@@ -75,7 +75,6 @@
   details > summary { list-style: none; }
   details > summary::-webkit-details-marker { display: none; }
 
-  /* استایل برای ساختار جایگزین کرکره در PDF */
   .pdf-accordion-replacement {
       background-color: #f8f9fa;
       border: 1px solid #dee2e6;
@@ -87,13 +86,48 @@
       border-bottom: 1px solid #dee2e6;
   }
 
+  .disabled-wrapper {
+    cursor: not-allowed;
+    display: inline-block;
+  }
+  .btn-action-disabled {
+    background: #adb5bd;
+    color: #f8f9fa;
+    cursor: not-allowed !important;
+    box-shadow: none;
+  }
+  .btn-action-disabled:hover {
+    transform: none;
+  }
+  .locked-feature-placeholder {
+    background-color: #f8f9fa;
+    border: 1px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 20px 0;
+    text-align: center;
+    color: #6c757d;
+  }
+  .locked-feature-placeholder .fa-lock,
+  .locked-feature-placeholder .fa-unlock-keyhole {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  .locked-feature-placeholder h4 {
+      color: #495057;
+      font-weight: bold;
+  }
+
   @media print {
     body { background: white !important; }
     #report-container { box-shadow: none; border: none; margin: 0; padding: 10px; max-width: 100%;}
     .no-print, .no-print-specific { display: none !important; }
-    .user-section, .subject-card-final, .pdf-accordion-replacement {
+    .user-section, .subject-card-final, .pdf-accordion-replacement, .locked-feature-placeholder {
         page-break-inside: avoid !important;
     }
+  }
+  .btn-custom:hover{
+      color: white !important;
   }
 </style>
 
@@ -104,15 +138,21 @@
       <div style="text-align: center;">
         <h1 style="color: #2a9d8f; font-weight: bold; margin-bottom: 20px;">گزارش تحلیلی آزمون</h1>
         <div class="report-actions no-print">
-          <a href="{% url 'dashboard' %}" class="btn-action-new">بازگشت به داشبورد</a>
+          <a href="{% url 'dashboard' %}" class="btn-action-new btn-custom">بازگشت به داشبورد</a>
+
           {% if user.is_authenticated %}
             <button class="btn-action-new" onclick="generatePDF()">دریافت PDF</button>
             <span id="loading" style="display:none; color: #e76f51;">در حال تولید PDF...</span>
+          {% else %}
+            <span class="disabled-wrapper" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" title="نیاز به ورود" data-bs-content="برای دریافت فایل PDF، لطفاً وارد شوید یا ثبت‌نام کنید.">
+              <button class="btn-action-new btn-action-disabled" disabled style="pointer-events: none;">دریافت PDF</button>
+            </span>
           {% endif %}
+
         </div>
       <div style="text-align: center; margin-top: 10px; font-size: 0.9rem; color: #555;">
-  تاریخ گزارش: {{ today_shamsi }}
-</div>
+          تاریخ گزارش: {{ today_shamsi }}
+      </div>
         <h2 style="color: #2a9d8f; text-align: right; margin-top: 40px; margin-bottom: 15px; padding-right: 10px;">خلاصه نتایج آزمون‌ها</h2>
       </div>
       <div class="summary-grid-new">
@@ -130,39 +170,66 @@
       </div>
   </div>
 
-  {% for item in report_items %}
-    <div class="subject-card-final {% if item.subject_name == 'ریاضی' %}red{% elif item.subject_name == 'شیمی' %}purple{% elif item.subject_name == 'فیزیک' %}orange{% else %}green{% endif %}">
-      <div class="card-top-section">
-          <div class="card-main-content">
-              <div class="card-header-final">
-                  <h3>تحلیل تفصیلی درس {{ item.subject_name }}</h3>
-                  <i class="stats-icon fa-solid {% if item.subject_name == 'ریاضی' %}fa-calculator{% elif item.subject_name == 'شیمی' %}fa-flask-vial{% elif item.subject_name == 'فیزیک' %}fa-atom{% else %}fa-dna{% endif %}"></i>
-              </div>
-              <table class="stats-table-final">
-                  <tr><th>مورد</th><th>مقدار</th></tr>
-                  <tr><td>تعداد کل سوالات</td><td>{{ item.subject_data.total }}</td></tr>
-                  <tr><td>پاسخ صحیح</td><td>{{ item.subject_data.correct }}</td></tr>
-                  <tr><td>پاسخ غلط</td><td>{{ item.subject_data.wrong }}</td></tr>
-                  <tr><td>بدون پاسخ</td><td>{{ item.subject_data.blank }}</td></tr>
-              </table>
-          </div>
-          <div class="donut-chart-wrapper">
-              <canvas id="donut-{{ item.chart_id }}"></canvas>
-              <div class="donut-percentage-final">{{ item.subject_data.percentage }}%</div>
-          </div>
-      </div>
-      <div class="recommendations-final">
-          <h4>توصیه‌ها</h4>
-          {% for feedback in item.feedback %}
-              <div class="feedback-box-final {% if item.subject_name == 'ریاضی' %}red{% elif item.subject_name == 'شیمی' %}purple{% elif item.subject_name == 'فیزیک' %}orange{% else %}green{% endif %}">{{ feedback|safe }}</div>
-          {% endfor %}
-      </div>
-    </div>
-  {% endfor %}
-
   {% if user.is_authenticated %}
-    <div class="user-section">
-      <h3 style="text-align: center; margin-bottom: 20px;" class="no-print-specific">تحلیل اختصاصی و ذخیره آزمون</h3>
+    {% for item in report_items %}
+      <div class="subject-card-final {% if item.subject_name == 'ریاضی' %}red{% elif item.subject_name == 'شیمی' %}purple{% elif item.subject_name == 'فیزیک' %}orange{% else %}green{% endif %}">
+        <div class="card-top-section">
+            <div class="card-main-content">
+                <div class="card-header-final">
+                    <h3>تحلیل تفصیلی درس {{ item.subject_name }}</h3>
+                    <i class="stats-icon fa-solid {% if item.subject_name == 'ریاضی' %}fa-calculator{% elif item.subject_name == 'شیمی' %}fa-flask-vial{% elif item.subject_name == 'فیزیک' %}fa-atom{% else %}fa-dna{% endif %}"></i>
+                </div>
+                <table class="stats-table-final">
+                    <tr><th>مورد</th><th>مقدار</th></tr>
+                    <tr><td>تعداد کل سوالات</td><td>{{ item.subject_data.total }}</td></tr>
+                    <tr><td>پاسخ صحیح</td><td>{{ item.subject_data.correct }}</td></tr>
+                    <tr><td>پاسخ غلط</td><td>{{ item.subject_data.wrong }}</td></tr>
+                    <tr><td>بدون پاسخ</td><td>{{ item.subject_data.blank }}</td></tr>
+                </table>
+            </div>
+            <div class="donut-chart-wrapper">
+                <canvas id="donut-{{ item.chart_id }}"></canvas>
+                <div class="donut-percentage-final">{{ item.subject_data.percentage }}%</div>
+            </div>
+        </div>
+        <div class="recommendations-final">
+            <h4>توصیه‌ها</h4>
+            {% for feedback in item.feedback %}
+                <div class="feedback-box-final {% if item.subject_name == 'ریاضی' %}red{% elif item.subject_name == 'شیمی' %}purple{% elif item.subject_name == 'فیزیک' %}orange{% else %}green{% endif %}">{{ feedback|safe }}</div>
+            {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="locked-feature-placeholder">
+        <i class="fa-solid fa-lock"></i>
+        <h4>تحلیل درس به درس قفل است</h4>
+        <p>برای مشاهده تحلیل دقیق هر درس به همراه نمودارها و توصیه‌های مربوطه، لطفاً <a href="{% url 'account_login' %}?next={{ request.path }}">وارد شوید</a> یا ثبت‌نام کنید.</p>
+    </div>
+  {% endif %}
+
+
+  <div class="user-section">
+
+    {% if complementary_feedback %}
+      <div class="complementary-feedback-container">
+        <h4 style="text-align: right; margin: 20px 0 15px;"><i class="fa-solid fa-microscope"></i> توصیه‌های کلی</h4>
+        {% for category, feedbacks in complementary_feedback.items %}
+          <details class="accordion-item recommendation-accordion" {% if user.is_authenticated %}open{% endif %}>
+          <summary class="accordion-header">{{ category }}</summary>
+            <div class="accordion-body">
+              {% for feedback in feedbacks %}
+                <div class="feedback-box-final blue" style="margin-top: 10px;">{{ feedback|safe }}</div>
+              {% endfor %}
+            </div>
+          </details>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <h3 style="text-align: center; margin-top: 40px; margin-bottom: 20px;" class="no-print-specific">تحلیل اختصاصی و ذخیره آزمون</h3>
+
+    {% if user.is_authenticated %}
       <div class="report-actions no-print-specific">
         <button id="save-exam-btn" class="btn-action-new" {% if is_exam_saved %}disabled{% endif %}>
           {% if is_exam_saved %}آزمون قبلاً ذخیره شده{% else %}ذخیره این آزمون در پروفایل{% endif %}
@@ -177,25 +244,20 @@
           {% endfor %}
         </div>
       {% endif %}
+    {% else %}
+      <div class="locked-feature-placeholder">
+          <i class="fa-solid fa-unlock-keyhole"></i>
+          <h4>ذخیره آزمون و تحلیل روند عملکرد</h4>
+          <p>این امکانات ویژه کاربران عضو است. با ورود به حساب خود می‌توانید این آزمون را ذخیره کرده و روند پیشرفت خود را در آزمون‌های مختلف مشاهده کنید.</p>
+      </div>
+    {% endif %}
 
-      {% if complementary_feedback %}
-        <div class="complementary-feedback-container">
-          <h4 style="text-align: right; margin: 20px 0 15px;"><i class="fa-solid fa-microscope"></i> توصیه‌های تکمیلی بر اساس قوانین</h4>
-          {% for category, feedbacks in complementary_feedback.items %}
-            <details class="accordion-item recommendation-accordion" open>
-              <summary class="accordion-header">{{ category }}</summary>
-              <div class="accordion-body">
-                {% for feedback in feedbacks %}
-                  <div class="feedback-box-final blue" style="margin-top: 10px;">{{ feedback|safe }}</div>
-                {% endfor %}
-              </div>
-            </details>
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
+  </div>
+
+  {% if user.is_authenticated %}
     <div id="notification-area" class="no-print"></div>
   {% endif %}
+
 </div>
 </div>
 
@@ -206,21 +268,16 @@
   async function generatePDF() {
     const loadingEl = document.getElementById('loading');
     const elementsToHide = document.querySelectorAll('.no-print');
-
-    // آماده‌سازی صفحه برای ساخت PDF
     elementsToHide.forEach(el => el.style.display = 'none');
-
-    // استراتژی جدید: جایگزینی موقت کرکره‌ها با div ساده
     const accordions = document.querySelectorAll('.recommendation-accordion');
     accordions.forEach(acc => {
         const replacementDiv = document.createElement('div');
         replacementDiv.classList.add('pdf-accordion-replacement');
-
         const header = acc.querySelector('.accordion-header');
         const body = acc.querySelector('.accordion-body');
         if (header && body) {
             const clonedHeader = header.cloneNode(true);
-            clonedHeader.querySelector('::before')?.remove(); // حذف فلش از نسخه کلون شده
+            clonedHeader.querySelector('::before')?.remove();
             replacementDiv.appendChild(clonedHeader);
             replacementDiv.appendChild(body.cloneNode(true));
         }
@@ -256,9 +313,7 @@
               before: ['.subject-card-final', '.user-section']
           }
         };
-
         await html2pdf().set(opt).from(element).save();
-
     } catch (e) {
         console.error('خطا در تولید PDF:', e);
         if(loadingEl) {
@@ -271,17 +326,19 @@
             }, 3000);
         }
     } finally {
-        // بازگرداندن صفحه به حالت اولیه
         elementsToHide.forEach(el => el.style.display = '');
         if(loadingEl) loadingEl.style.display = 'none';
-
-        // حذف divهای جایگزین و نمایش مجدد کرکره‌های اصلی
         document.querySelectorAll('.pdf-accordion-replacement').forEach(rep => rep.remove());
         accordions.forEach(acc => acc.style.display = '');
     }
   }
 
   window.addEventListener('load', () => {
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      return new bootstrap.Popover(popoverTriggerEl)
+    });
+
     const labels = JSON.parse(document.getElementById('chart-labels').textContent);
     const reportItemsData = JSON.parse(document.getElementById('report-items-data').textContent);
     const percentages = reportItemsData.map(item => item.subject_data.percentage);

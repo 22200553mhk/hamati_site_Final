@@ -1,18 +1,21 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
 from .models import Exam, SubjectResult
 import json
 import jdatetime
 from django.contrib.auth import logout
 import socket
-from django.contrib import messages
 from allauth.account.views import SignupView, LoginView
 from allauth.account.models import EmailAddress
 from django.http import JsonResponse
-from django.contrib.auth.models import User
-
+from django.contrib.auth import get_user_model
+from django.shortcuts import redirect
+from django.core.mail import send_mail
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.conf import settings
+from .forms import CustomSignupForm
 
 
 def calculate_percentage(correct, wrong, total):
@@ -154,7 +157,7 @@ def generate_complementary_feedback(test_results):
     normalized_percentages = {k: v for k, v in normalized_percentages.items() if v is not None}
 
     if len(normalized_percentages) < 4:
-        feedback["تحلیل جامع سطح عملکرد"] = [
+        feedback["تحلیل کلی"] = [
             "برای دریافت تحلیل جامع و توصیه‌های تکمیلی، لطفاً نتایج هر چهار درس را وارد کنید."]
         return feedback
 
@@ -270,11 +273,11 @@ def generate_complementary_feedback(test_results):
             "<strong>برنامه عملیاتی (انتقال اعتماد به نفس و ایجاد تعادل):</strong> احتمالاً شما زمان یا انرژی بسیار زیادی را صرف آن یک درس کرده‌اید. اکنون زمان آن است که ضمن حفظ آن درس با مرور و تست کمتر، بخش اصلی انرژی خود را به دروس دیگر اختصاص دهید. برای هر کدام از دروس دیگر یک نقشه جبرانی دقیق بچینید و با استفاده از **اعتماد به نفسی** که از موفقیت در درس قوی خود گرفته‌اید، آن‌ها را نیز گام به گام بالا بیاورید.")
 
     if cat3_4_feedback:
-        feedback["تحلیل جامع سطح عملکرد"] = cat3_4_feedback
+        feedback["تحلیل کلی"] = cat3_4_feedback
 
     # اگر هیچ قانونی اعمال نشد، یک پیام پیش‌فرض نمایش بده
     if not feedback:
-        feedback["تحلیل جامع سطح عملکرد"] = [
+        feedback["تحلیل کلی"] = [
             "وضعیت نمرات شما در هیچ‌کدام از الگوهای تحلیلی رایج قرار نگرفت. برای دریافت تحلیل دقیق‌تر، با یک مشاور صحبت کنید."]
 
     return feedback
@@ -299,8 +302,12 @@ def generate_report(request):
     num_subjects = len(test_results)
     avg_percentage = sum(d['percentage'] for d in test_results.values()) / num_subjects if num_subjects > 0 else 0
 
+    # ✅ START: تغییر اصلی اینجاست
+    # این تابع باید برای همه کاربران اجرا شود، پس آن را به بیرون از شرط منتقل می‌کنیم
+    complementary_feedback = generate_complementary_feedback(test_results)
+    # ✅ END: تغییر اصلی
+
     historical_feedback = []
-    complementary_feedback = {}
 
     if request.user.is_authenticated:
         if not Exam.objects.filter(user=request.user).exists() and 'test_results' in request.session:
@@ -309,7 +316,9 @@ def generate_report(request):
         else:
             historical_feedback = generate_historical_feedback(request.user, test_results)
 
-        complementary_feedback = generate_complementary_feedback(test_results)
+        # خط زیر از اینجا حذف شد، چون به بیرون منتقل شده است
+        # complementary_feedback = generate_complementary_feedback(test_results)
+
         exam_id = request.session.get('saved_exam_id')
         is_exam_saved = exam_id and Exam.objects.filter(id=exam_id, user=request.user).exists()
     else:
@@ -329,7 +338,6 @@ def generate_report(request):
         'is_exam_saved': is_exam_saved,
     }
     return render(request, 'analyzer/report.html', context)
-
 
 @login_required
 @csrf_exempt
@@ -368,15 +376,25 @@ def user_profile(request):
     return render(request, 'analyzer/profile.html', {'exams': user_exams})
 
 
+
 @login_required
 def delete_account(request):
     if request.method == 'POST':
         user = request.user
+
+        #  ✅ شرط اصلی اینجاست
+        # بررسی کن که آیا کاربر سوپریوزر است یا نه
+        if user.is_superuser:
+            messages.error(request, 'شما نمی‌توانید حساب کاربری ادمین را از این طریق حذف کنید.')
+            return redirect('dashboard') # یا هر صفحه دیگری که مناسب است
+
+        # اگر کاربر ادمین نبود، عملیات حذف را ادامه بده
         logout(request)
         user.delete()
-        return redirect('dashboard')
-    return render(request, 'analyzer/delete_account_confirm.html')
+        messages.success(request, 'حساب کاربری شما با موفقیت حذف شد.')
+        return redirect('home') # یا صفحه اصلی سایت
 
+    return render(request, 'analyzer/delete_account.html')
 
 @login_required
 def account_redirect(request):
@@ -490,12 +508,67 @@ def save_all_results(request):
 
 @require_GET
 def check_username(request):
-    username = request.GET.get('username', '').strip()
-    exists = User.objects.filter(username__iexact=username).exists()
+    input_username = request.GET.get('username', '').strip()
+    exists = False
+
+    if input_username:
+        User = get_user_model()
+        for user in User.objects.all():
+            display_name = user.get_full_name().strip() or user.username
+            if display_name.lower() == input_username.lower() or user.username.lower() == input_username.lower():
+                exists = True
+                break
+
     return JsonResponse({'exists': exists})
+
 
 @require_GET
 def check_email(request):
     email = request.GET.get('email', '').strip()
+    User = get_user_model()
     exists = User.objects.filter(email__iexact=email).exists()
     return JsonResponse({'exists': exists})
+
+
+def signup_view(request):
+    if request.method == 'POST':
+        form = CustomSignupForm(request.POST)
+        if form.is_valid():
+            # کاربر جدید ساخته میشه ولی غیرفعاله
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+
+            # شناسه کاربر توی session ذخیره میشه
+            request.session['unverified_user_id'] = user.id
+
+            # هدایت به صفحه وارد کردن کد یا تایید ایمیل
+            return redirect('verify_email_page')
+    else:
+        form = CustomSignupForm()
+
+    return render(request, 'account/signup.html', {'form': form})
+def delete_unverified_user(request):
+    user_id = request.session.get('unverified_user_id')
+
+    if user_id:
+        User = get_user_model()
+        try:
+            # فقط اکانتی که هنوز فعال نشده حذف بشه
+            user_to_delete = User.objects.get(pk=user_id, is_active=False)
+            user_to_delete.delete()
+            messages.info(request, 'حساب تاییدنشده شما حذف شد. لطفاً دوباره ثبت‌نام کنید.')
+        except User.DoesNotExist:
+            pass
+
+        # شناسه از session پاک بشه
+        request.session.pop('unverified_user_id', None)
+
+    # برگشت به فرم ثبت‌نام
+    return redirect('account_signup')
+
+def check_email_exists_password(request):
+    User = get_user_model()
+    email = request.GET.get("email", None)
+    exists = User.objects.filter(email=email).exists()
+    return JsonResponse({"exists": exists})

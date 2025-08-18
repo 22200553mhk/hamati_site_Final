@@ -1,0 +1,158 @@
+{% extends 'analyzer/base.html' %}
+
+{% block title %}دسته بندی مقالات{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* این استایل‌ها به طور کامل بازنویسی شده‌اند تا دقیقاً مشابه تصویر درخواستی شما باشند.
+    */
+    body {
+        background-color: #45B8AC !important; /* رنگ پس زمینه اصلی صفحه */
+    }
+
+    .container.category-container {
+        display: flex;
+        gap: 40px;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding-top: 50px;
+        padding-bottom: 50px;
+    }
+
+    /* ستون اصلی برای هر دسته */
+    .category-column {
+        width: 350px;
+        border-radius: 35px; /* گرد کردن گوشه‌ها مشابه تصویر */
+        padding: 20px;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    /* رنگ‌های مختلف برای دسته‌بندی‌ها */
+    .category-column:nth-child(1) { background-color: #9ABD4A; } /* سبز زیتونی */
+    .category-column:nth-child(2) { background-color: #E67E22; } /* نارنجی */
+    .category-column:nth-child(3) { background-color: #3498DB; } /* آبی */
+    .category-column:nth-child(4) { background-color: #E74C3C; } /* قرمز */
+    .category-column:nth-child(5) { background-color: #9B59B6; } /* بنفش */
+    .category-column:nth-child(6) { background-color: #F39C12; } /* زرد نارنجی */
+    .category-column:nth-child(7) { background-color: #1ABC9C; } /* سبز دریایی */
+    .category-column:nth-child(8) { background-color: #34495E; } /* خاکستری تیره */
+    .category-column:nth-child(9) { background-color: #D35400; } /* نارنجی تیره */
+    .category-column:nth-child(10) { background-color: #8E44AD; } /* بنفش تیره */
+    .category-column:nth-child(11) { background-color: #16A085; } /* سبز آبی */
+    .category-column:nth-child(12) { background-color: #2980B9; } /* آبی تیره */
+
+    /* برای دسته‌بندی‌های بیشتر از 12، رنگ‌ها تکرار می‌شوند */
+    .category-column:nth-child(n+13) {
+        background-color: #9ABD4A;
+    }
+
+    /* بخش هدر دسته که شامل عنوان و دایره بزرگ است */
+    .category-header {
+        position: relative; /* برای جای‌گذاری دقیق دایره */
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        padding: 5px 0;
+    }
+
+    /* کادر گرد عنوان دسته */
+    .category-header-title {
+        border: 4px solid rgba(0,0,0,0.2); /* بردر تیره‌تر */
+        color: #333;
+        padding: 15px 60px 15px 25px; /* پدینگ بیشتر در سمت راست برای همپوشانی دایره */
+        border-radius: 50px; /* گردی کامل برای ایجاد شکل کپسولی */
+        font-size: 1.3rem;
+        font-weight: bold;
+        width: 100%;
+        text-align: center;
+        z-index: 1; /* این عنصر زیر دایره قرار می‌گیرد */
+        background-color: inherit; /* رنگ پس‌زمینه از والد ارث‌بری می‌شود */
+    }
+
+    /* دایره بزرگ و خاکستری در هدر */
+    .category-header-circle {
+        width: 95px;
+        height: 95px;
+        background-color: #E0E0E0; /* رنگ خاکستری روشن از تصویر */
+        border-radius: 50%;
+        border: 4px solid rgba(0,0,0,0.2); /* بردر تیره‌تر */
+        position: absolute; /* موقعیت‌یابی دقیق نسبت به هدر */
+        right: -30px; /* بیرون‌زدگی از سمت راست */
+        top: 50%;
+        transform: translateY(-50%); /* مرکزیت عمودی کامل */
+        z-index: 2; /* این عنصر روی کادر عنوان قرار می‌گیرد */
+    }
+
+    /* لیست مقالات */
+    .article-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 15px; /* فاصله بین آیتم‌ها */
+    }
+
+    /* هر آیتم مقاله در لیست */
+    .article-item {
+        display: flex;
+        align-items: center;
+        background-color: #E0E0E0; /* پس‌زمینه خاکستری روشن */
+        border-radius: 50px; /* گردی کامل برای ایجاد شکل کپسولی */
+        padding: 8px;
+        transition: transform 0.2s ease-in-out;
+        text-decoration: none;
+        /* بدون بردر، مطابق تصویر */
+    }
+
+    .article-item:hover {
+        transform: scale(1.03);
+    }
+
+    /* دایره کوچک کنار هر آیتم مقاله */
+    .article-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        background-color: #E0E0E0; /* هم‌رنگ با والد خود */
+        flex-shrink: 0;
+        /* بدون بردر، مطابق تصویر */
+    }
+
+    /* عنوان هر مقاله */
+    .article-title {
+        color: #333;
+        font-size: 1rem;
+        flex-grow: 1;
+        text-align: center;
+        margin: 0;
+        padding-right: 10px; /* کمی فاصله از دایره */
+    }
+</style>
+{% endblock extra_head %}
+
+{% block content %}
+<div class="container category-container fade-in">
+    {% for category in categories %}
+    <div class="category-column">
+        <div class="category-header">
+            <div class="category-header-title">{{ category.title }}</div>
+            <div class="category-header-circle"></div>
+        </div>
+
+        <ul class="article-list">
+            {% for article in category.articles.all %}
+            <li>
+                <a href="{% url 'articles:article_detail' slug=article.slug %}" class="article-item">
+                    <span class="article-icon"></span>
+                    <p class="article-title">{{ article.title }}</p>
+                </a>
+            </li>
+            {% empty %}
+            <li><p style="text-align:center; color:white;">هنوز مقاله‌ای در این دسته ثبت نشده است.</p></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,11 +1,19 @@
 from django import forms
+from django.core.validators import RegexValidator
 from allauth.account.forms import SignupForm
 
-class CustomSignupForm(SignupForm):
-    name = forms.CharField(max_length=100, label='نام و نام خانوادگی')
+username_validator = RegexValidator(
+    r'^[a-zA-Z0-9\u0600-\u06FF\s]+$',
+    'نام کاربری فقط می‌تواند شامل حروف، اعداد و فاصله باشد.'
+)
 
-    def save(self, request):
-        user = super(CustomSignupForm, self).save(request)
-        user.first_name = self.cleaned_data['name']
-        user.save()
-        return user
+class CustomSignupForm(SignupForm):
+    username = forms.CharField(
+        label='نام کاربری',
+        max_length=150,
+        validators=[username_validator],
+        widget=forms.TextInput(attrs={'placeholder': 'نام کاربری خود را وارد کنید'})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

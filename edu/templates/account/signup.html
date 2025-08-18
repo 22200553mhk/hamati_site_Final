@@ -1,129 +1,199 @@
 {% extends "analyzer/base.html" %}
 {% load i18n %}
 {% load allauth account socialaccount %}
+{% load static %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card p-4 text-center">
-                <h1 class="h3 mb-3 fw-bold">ایجاد حساب کاربری</h1>
-                <p class="text-muted mb-4">به پلنیکا خوش آمدید!</p>
+<style>
+    /* Ensures labels and form text align to the right for Farsi/Persian UI */
+    .form-label, .form-text {
+        text-align: right !important;
+        display: block; /* Ensures text-align works correctly on labels */
+    }
+    .social-login img {
+        height: 18px;
+        margin-left: 8px; /* In LTR context, this would be margin-right */
+    }
+</style>
+
+<div class="container-fluid" style="background: linear-gradient(135deg, #1E8FA5, #2A9DB2); min-height: 100vh;">
+    <div class="container">
+        <div class="row align-items-center justify-content-center" style="min-height: 100vh;">
+
+            <div class="col-md-5 order-1 order-md-0 p-5 bg-white shadow-lg rounded-3">
+                <div class="text-center mb-4">
+                    <img src="{% static 'images/logo.png' %}" alt="لوگو پلنیکا" style="height: 60px;">
+                    <h1 class="h3 my-3 fw-bold">ایجاد حساب کاربری</h1>
+                    <p class="text-muted">به پلنیکا خوش آمدید!</p>
+                </div>
 
                 {% get_providers as socialaccount_providers %}
                 {% if socialaccount_providers %}
                     <div class="social-login">
-                        <h5 class="mb-3">ثبت‌نام سریع با گوگل</h5>
+                        <h5 class="text-center mb-3 fw-normal">ثبت‌نام سریع با گوگل</h5>
                         {% provider_login_url "google" as google_url %}
-                        <a href="{{ google_url }}" class="btn btn-danger w-100 mb-2">
-                            <i class="fab fa-google me-2"></i> ثبت‌نام با گوگل
+                        <a href="{{ google_url }}" class="btn btn-outline-dark w-100 mb-4 fw-bold">
+                            <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google">
+                            ثبت‌نام با گوگل
                         </a>
                     </div>
 
-                    <div class="my-4 d-flex align-items-center">
+                    <div class="my-3 d-flex align-items-center">
                         <hr class="flex-grow-1">
                         <span class="mx-2 text-muted">یا</span>
                         <hr class="flex-grow-1">
                     </div>
                 {% endif %}
 
-                <h5 class="mb-3">ثبت‌نام با ایمیل و رمز عبور</h5>
+                <h5 class="text-center mb-3 fw-normal">ثبت‌نام با ایمیل و رمز عبور</h5>
 
                 <form class="signup text-start" id="signup_form" method="post" action="{% url 'account_signup' %}">
                     {% csrf_token %}
 
-                    {% for field in form %}
-                        <div class="mb-3">
-                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                            <input
-                                type="{{ field.field.widget.input_type }}"
-                                name="{{ field.name }}"
-                                id="{{ field.id_for_label }}"
-                                class="form-control"
-                                {% if field.field.required %}required{% endif %}
-                                value="{{ field.value|default_if_none:'' }}">
-                            {% for error in field.errors %}
-                                <div class="form-text text-danger">{{ error }}</div>
-                            {% endfor %}
-                            <div id="{{ field.name }}-error" class="form-text text-danger"></div>
-                        </div>
-                    {% endfor %}
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">:ایمیل</label>
+                        {{ form.email }}
+                        {% for error in form.email.errors %}
+                            <div class="form-text text-danger">{{ error }}</div>
+                        {% endfor %}
+                        <div id="email-error" class="form-text text-danger"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">نام کاربری</label>
+                        {{ form.username }}
+                        {% for error in form.username.errors %}
+                            <div class="form-text text-danger">{{ error }}</div>
+                        {% endfor %}
+                        <div id="username-error" class="form-text text-danger"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.password1.id_for_label }}" class="form-label">رمز عبور</label>
+                        {{ form.password1 }}
+                        {% for error in form.password1.errors %}
+                            <div class="form-text text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.password2.id_for_label }}" class="form-label">تکرار رمز عبور</label>
+                        {{ form.password2 }}
+                        {% for error in form.password2.errors %}
+                            <div class="form-text text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
 
                     {% if redirect_field_value %}
                         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
                     {% endif %}
 
-                    <button id="submit-btn" class="w-100 btn btn-success mt-3" type="submit" disabled>ثبت نام</button>
+                    <button id="submit-btn" class="w-100 btn btn-success mt-3 fw-bold" type="submit">ثبت نام</button>
                 </form>
 
-                <div class="mt-3">
+                <div class="mt-3 text-center">
                     <a class="text-muted small" href="{% url 'account_login' %}">قبلاً ثبت‌نام کرده‌اید؟ وارد شوید</a>
                 </div>
             </div>
+
+            <div class="col-md-7 order-0 order-md-1 d-flex justify-content-center align-items-center p-4">
+                <img src="{% static 'images/login-illustration.png' %}" alt="ثبت نام" class="img-fluid" style="max-height: 550px;">
+            </div>
+
         </div>
     </div>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const usernameInput = document.querySelector("#id_username");
-    const emailInput = document.querySelector("#id_email");
-    const submitBtn = document.querySelector("#submit-btn");
+    // گرفتن المان‌های فرم
+    const usernameInput = document.getElementById('id_username');
+    const emailInput = document.getElementById('id_email');
+    const password1Input = document.getElementById('id_password1');
+    const password2Input = document.getElementById('id_password2');
+    const submitBtn = document.getElementById("submit-btn");
 
-    let usernameValid = false;
-    let emailValid = false;
+    // ۱. متغیرهایی برای نگهداری وضعیت اعتبارسنجی هر فیلد
+    let isUsernameAvailable = true;
+    let isEmailAvailable = true;
 
-    function updateSubmitButton() {
-        submitBtn.disabled = !(usernameValid && emailValid);
+    // افزودن کلاس‌های بوت‌استرپ و placeholder به فیلدها
+    if (emailInput) {
+        emailInput.classList.add('form-control');
+        emailInput.placeholder = 'name@example.com';
+        emailInput.required = true;
+    }
+    if (usernameInput) {
+        usernameInput.classList.add('form-control');
+        usernameInput.placeholder = 'نام کاربری دلخواه خود را وارد کنید';
+        usernameInput.required = true;
+    }
+    if (password1Input) {
+        password1Input.classList.add('form-control');
+        password1Input.placeholder = 'یک رمز عبور قوی انتخاب کنید';
+        password1Input.required = true;
+    }
+    if (password2Input) {
+        password2Input.classList.add('form-control');
+        password2Input.placeholder = 'رمز عبور خود را تکرار کنید';
+        password2Input.required = true;
     }
 
+    // ۲. تابعی برای به‌روزرسانی وضعیت دکمه ثبت‌نام
+    function updateSubmitButtonState() {
+        // دکمه فقط زمانی فعال است که هر دو فیلد معتبر (تکراری نباشند) باشند
+        submitBtn.disabled = !(isUsernameAvailable && isEmailAvailable);
+    }
+
+    // تابع بررسی یکتا بودن نام کاربری و ایمیل با Fetch API
     function checkUnique(field, value, errorDivId, url) {
+        const errorDiv = document.getElementById(errorDivId);
+
+        // اگر فیلد خالی شود، خطا را پاک کرده و وضعیت را معتبر می‌کنیم
         if (!value.trim()) {
-            document.getElementById(errorDivId).textContent = "";
-            if(field === 'username') usernameValid = false;
-            if(field === 'email') emailValid = false;
-            updateSubmitButton();
+            errorDiv.textContent = "";
+            if (field === 'username') isUsernameAvailable = true;
+            if (field === 'email') isEmailAvailable = true;
+            updateSubmitButtonState(); // فراخوانی تابع برای آپدیت دکمه
             return;
         }
 
         fetch(`${url}?${field}=${encodeURIComponent(value)}`)
             .then(response => response.json())
             .then(data => {
+                // ۳. آپدیت کردن وضعیت بر اساس پاسخ سرور
                 if (data.exists) {
-                    document.getElementById(errorDivId).textContent = "این مقدار قبلاً استفاده شده است.";
-                    if(field === 'username') usernameValid = false;
-                    if(field === 'email') emailValid = false;
+                    errorDiv.textContent = "این مقدار قبلاً استفاده شده است.";
+                    if (field === 'username') isUsernameAvailable = false;
+                    if (field === 'email') isEmailAvailable = false;
                 } else {
-                    document.getElementById(errorDivId).textContent = "";
-                    if(field === 'username') usernameValid = true;
-                    if(field === 'email') emailValid = true;
+                    errorDiv.textContent = "";
+                    if (field === 'username') isUsernameAvailable = true;
+                    if (field === 'email') isEmailAvailable = true;
                 }
-                updateSubmitButton();
+                updateSubmitButtonState(); // فراخوانی تابع برای آپدیت دکمه
             })
             .catch(() => {
-                document.getElementById(errorDivId).textContent = "خطا در بررسی.";
-                if(field === 'username') usernameValid = false;
-                if(field === 'email') emailValid = false;
-                updateSubmitButton();
+                errorDiv.textContent = "خطا در برقراری ارتباط با سرور.";
+                // در صورت خطا، برای احتیاط دکمه را غیرفعال می‌کنیم
+                if (field === 'username') isUsernameAvailable = false;
+                if (field === 'email') isEmailAvailable = false;
+                updateSubmitButtonState();
             });
     }
 
-    usernameInput.addEventListener("input", function() {
-        checkUnique('username', usernameInput.value, 'username-error', "{% url 'check_username' %}");
-    });
-
-    emailInput.addEventListener("input", function() {
-        checkUnique('email', emailInput.value, 'email-error', "{% url 'check_email' %}");
-    });
-
-    // اگر قبلاً مقدار داشتند چک اولیه انجام شود:
-    if(usernameInput.value.trim() !== "") {
-        usernameInput.dispatchEvent(new Event('input'));
+    // افزودن event listener برای اعتبارسنجی زنده
+    if (usernameInput) {
+        usernameInput.addEventListener("input", function() {
+            checkUnique('username', this.value, 'username-error', "{% url 'check_username' %}");
+        });
     }
-    if(emailInput.value.trim() !== "") {
-        emailInput.dispatchEvent(new Event('input'));
+
+    if (emailInput) {
+        emailInput.addEventListener("input", function() {
+            checkUnique('email', this.value, 'email-error', "{% url 'check_email' %}");
+        });
     }
 });
 </script>
-
 {% endblock %}

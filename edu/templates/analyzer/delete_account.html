@@ -1,0 +1,245 @@
+{% extends "analyzer/base.html" %}
+
+{% load i18n %}
+
+
+
+{% block content %}
+
+<style>
+
+/* مخفی کردن هدر و فوتر و تنظیم پس‌زمینه */
+
+body {
+
+background-color: #3d8f99 !important;
+
+overflow: hidden;
+
+background-image: none !important;
+
+
+
+}
+
+a:hover{
+
+color: white;
+
+}
+
+header, footer {
+
+display: none !important;
+
+}
+
+nav{
+
+display: none !important;
+
+}
+
+
+
+/* لایه تمام‌صفحه برای وسط‌چین کردن کادر */
+
+.delete-page-wrapper {
+
+position: fixed;
+
+top: 0;
+
+left: 0;
+
+width: 100%;
+
+height: 100%;
+
+display: flex;
+
+justify-content: center;
+
+align-items: center;
+
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+}
+
+
+
+/* کادر سفیدرنگ اصلی */
+
+.delete-box {
+
+background-color: white;
+
+padding: 40px;
+
+border-radius: 12px;
+
+text-align: center;
+
+max-width: 500px;
+
+width: 90%;
+
+box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+
+}
+
+
+
+/* عنوان قرمز رنگ */
+
+.delete-box h1 {
+
+color: #e74c3c;
+
+font-size: 1.75rem;
+
+font-weight: bold;
+
+margin-bottom: 1.5rem;
+
+}
+
+
+
+/* متن اصلی سوال */
+
+.delete-box .confirm-text {
+
+font-size: 1.1rem;
+
+color: #333;
+
+margin-bottom: 1rem;
+
+line-height: 1.7;
+
+}
+
+
+
+/* متن هشدار با فونت کمی کوچک‌تر */
+
+.delete-box .warning-text {
+
+font-size: 0.95rem;
+
+color: #6c757d;
+
+margin-bottom: 2.5rem;
+
+line-height: 1.6;
+
+}
+
+
+
+/* استایل‌های مشترک برای هر دو دکمه */
+
+.btn-base {
+
+color: white;
+
+border: none;
+
+padding: 13px 0;
+
+width: 100%;
+
+border-radius: 8px;
+
+font-size: 1.1rem;
+
+font-weight: 500;
+
+cursor: pointer;
+
+text-decoration: none;
+
+display: block;
+
+transition: background-color 0.2s ease;
+
+}
+
+
+
+/* دکمه قرمز "حذف" */
+
+.btn-danger {
+
+background-color: #e74c3c;
+
+margin-bottom: 12px; /* فاصله بین دو دکمه */
+
+}
+
+.btn-danger:hover {
+
+background-color: #c0392b;
+
+}
+
+
+
+/* دکمه فیروزه‌ای "انصراف" */
+
+.btn-cancel {
+
+background-color: #48a3ad;
+
+}
+
+.btn-cancel:hover {
+
+background-color: #3a8c94;
+
+}
+
+</style>
+
+
+
+<div class="delete-page-wrapper">
+
+<div class="delete-box">
+
+<h1>حذف حساب کاربری</h1>
+
+<p class="confirm-text">
+
+آیا مطمئن هستید که می خواهید حساب کاربری خود را برای همیشه حذف کنید؟
+
+</p>
+
+<p class="warning-text">
+
+توجه: این عمل غیرقابل بازگشت است و تمام اطلاعات شما، از جمله آزمون‌های ذخیره شده، برای همیشه پاک خواهد شد.
+
+</p>
+
+
+
+<form method="post" action="{% url 'delete_account' %}">
+
+{% csrf_token %}
+
+<button class="btn-base btn-danger" type="submit">بله، حسابم را حذف کن</button>
+
+</form>
+
+
+
+<a href="javascript:history.back()" class="btn-base btn-cancel">نه، منصرف شدم</a>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+

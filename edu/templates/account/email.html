@@ -1,0 +1,47 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Verify Your E-mail Address" %}</title>
+    <style>
+        /* استایل‌ها بدون تغییر باقی می‌مانند */
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap');
+        body { font-family: 'Vazirmatn', sans-serif; background-color: #f4f7f9; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 500px; background-color: #fff; padding: 32px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); text-align: center; }
+        h1 { font-size: 24px; font-weight: 700; margin-bottom: 16px; color: #333; }
+        p { font-size: 16px; color: #555; line-height: 1.6; margin-bottom: 24px; }
+        .email-address { font-weight: 700; color: #0056b3; direction: ltr; display: inline-block; }
+        .btn { font-family: 'Vazirmatn', sans-serif; background-color: #007bff; color: #fff; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500; width: 100%; }
+        .alert-box { background-color: #e8f5e9; color: #2e7d32; padding: 16px; border-radius: 8px; margin-bottom: 24px; border: 1px solid #c8e6c9; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>وضعیت ایمیل</h1>
+
+        {% if unverified_emailaddresses %}
+            {% for emailaddress in unverified_emailaddresses %}
+                 <p>
+                    برای فعال‌سازی حساب، باید آدرس ایمیل خود را تایید کنید:
+                    <br>
+                    <span class="email-address">{{ emailaddress.email }}</span>
+                </p>
+                <form method="post" action="{% url 'account_email' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="email" value="{{ emailaddress.email }}">
+                    <button class="btn" type="submit" name="action_send">
+                        ارسال مجدد لینک تایید
+                    </button>
+                </form>
+            {% endfor %}
+        {% else %}
+             <p>✅ آدرس ایمیل شما با موفقیت تایید شده است و نیازی به اقدام دیگری نیست.</p>
+        {% endif %}
+
+    </div>
+
+</body>
+</html>

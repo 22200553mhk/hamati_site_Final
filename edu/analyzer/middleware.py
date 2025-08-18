@@ -1,6 +1,11 @@
 from django.shortcuts import redirect
 from django.urls import reverse
 from allauth.account.models import EmailAddress
+from django.db import models
+from django.core.validators import RegexValidator
+from django.contrib.auth.models import AbstractUser
+
+
 
 class EmailVerificationMiddleware:
     """
@@ -19,3 +24,5 @@ class EmailVerificationMiddleware:
             except EmailAddress.DoesNotExist:
                 pass
         return self.get_response(request)
+
+

@@ -8,17 +8,52 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d50c454c-26a3-4168-840d-b97779a5594c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/analyzer/templatetags/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/analyzer/templatetags/jalali_filters.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/analyzer/signals.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/analyzer/templatetags/review_extras.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/analyzer/templatetags/review_tags.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/blog/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/reviews/forms.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/reviews/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/account/email.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/analyzer/delete_account.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/blog/article_detail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/blog/category_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/core/about_us.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/reviews/review_page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/adapters.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/adapters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/apps.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/apps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/middleware.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/middleware.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analyzer/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/analyzer/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/analyzer/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyzer/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/konkur/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/konkur/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/konkur/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/konkur/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/account/email/email_confirmation_message.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/email/email_confirmation_message.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/account/email/password_reset_key_message.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/email/password_reset_key_message.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/account/email_confirm.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/email_confirm.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/account/email_confirmed.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/account/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/account/logout.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/logout.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/account/password_reset.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/password_reset.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/account/password_reset_done.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/password_reset_done.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/account/password_reset_from_key.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/password_reset_from_key.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/account/password_reset_from_key_done.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/password_reset_from_key_done.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/account/signup.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/signup.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/account/verification_sent.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/account/verification_sent.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/analyzer/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/analyzer/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/analyzer/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/analyzer/home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/analyzer/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/analyzer/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/analyzer/delete_account_confirm.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/analyzer/profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/analyzer/profile.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/analyzer/report.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/analyzer/report.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/socialaccount/email_confirm.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/socialaccount/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/socialaccount/login.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,8 +67,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="CSS File" />
-        <option value="HTML File" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -79,6 +114,9 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\hamati_site_Final\edu\core" />
+      <recent name="D:\hamati_site_Final\edu\templates\analyzer" />
+      <recent name="D:\hamati_site_Final\edu\templates\account" />
       <recent name="E:\hamati_site_Final\edu\templates" />
       <recent name="E:\hamati_site_Final\edu\static\fonts" />
     </key>
@@ -154,11 +192,31 @@
       <workItem from="1754484997460" duration="9977000" />
       <workItem from="1754499252199" duration="2559000" />
       <workItem from="1754542024634" duration="11566000" />
+      <workItem from="1754982984430" duration="7929000" />
+      <workItem from="1755064465306" duration="35369000" />
+      <workItem from="1755152842904" duration="6094000" />
+      <workItem from="1755177144068" duration="3842000" />
+      <workItem from="1755269130014" duration="5247000" />
+      <workItem from="1755337972231" duration="20279000" />
+      <workItem from="1755433931375" duration="3468000" />
+      <workItem from="1755445180923" duration="7324000" />
+      <workItem from="1755511517214" duration="18572000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

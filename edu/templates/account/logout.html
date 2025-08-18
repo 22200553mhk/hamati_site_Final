@@ -2,22 +2,106 @@
 {% load i18n %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card p-4 text-center">
-                <h1 class="h3 mb-3 fw-bold">{% trans "Sign Out" %}</h1>
-                <p class="mb-4">آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟</p>
+<style>
+    /* این بخش صفحه را بدون هدر و فوتر، تمام‌صفحه می‌کند */
+    body {
+        background-color: #3d8f99 !important; /* مهم است تا استایل‌های دیگر را لغو کند */
+        overflow: hidden; /* جلوگیری از اسکرول خوردن */
+        background-image: none !important;
+    }
 
-                <form method="post" action="{% url 'account_logout' %}">
-                    {% csrf_token %}
-                    {% if redirect_field_value %}
-                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
-                    {% endif %}
-                    <button class="btn btn-danger w-100" type="submit">{% trans 'Sign Out' %}</button>
-                </form>
-            </div>
-        </div>
+    /* این دو بخش هدر و فوتر اصلی سایت را مخفی می‌کنند */
+    header, footer {
+        display: none !important;
+    }
+    nav{
+                display: none !important;
+    }
+    a:hover{
+        color: white;
+    }
+
+    .logout-page-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logout-box {
+        background-color: white;
+        padding: 40px;
+        border-radius: 12px;
+        text-align: center;
+        max-width: 450px;
+        width: 90%;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .logout-box h1 {
+        font-size: 1.75rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    .logout-box p {
+        font-size: 1.1rem;
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+
+    .btn-base {
+        /* استایل پایه برای هر دو دکمه */
+        color: white;
+        border: none;
+        padding: 12px 0;
+        width: 100%;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none; /* برای لینک‌ها */
+        display: block; /* برای اینکه تمام عرض را بگیرد */
+        transition: background-color 0.2s ease;
+    }
+
+    .logout-btn {
+        background-color: #e74c3c;
+        margin-bottom: 10px; /* فاصله از دکمه انصراف */
+    }
+
+    .logout-btn:hover {
+        background-color: #c0392b;
+    }
+
+    .cancel-btn {
+        /* استایل جدید برای دکمه انصراف */
+        background-color: #6c757d; /* رنگ طوسی */
+    }
+
+    .cancel-btn:hover {
+        background-color: #5a6268; /* طوسی تیره‌تر */
+    }
+</style>
+
+<div class="logout-page-wrapper">
+    <div class="logout-box">
+        <h1>خروج</h1>
+        <p>آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟</p>
+
+        <form method="post" action="{% url 'account_logout' %}">
+            {% csrf_token %}
+            {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+            {% endif %}
+            <button class="btn-base logout-btn" type="submit">خروج</button>
+        </form>
+
+        <a href="javascript:history.back()" class="btn-base cancel-btn">انصراف</a>
     </div>
 </div>
 {% endblock %}

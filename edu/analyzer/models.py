@@ -3,9 +3,16 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Avg
+from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
+from django.db import models
+from django.conf import settings
+
+
+
 
 class Exam(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exams')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='exams')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def get_average_percentage(self):
@@ -32,3 +39,29 @@ class SubjectResult(models.Model):
 
     def __str__(self):
         return f"{self.subject_name} - {self.percentage:.1f}%"
+
+    username_validator = RegexValidator(
+        r'^[a-zA-Z0-9\u0600-\u06FF\s]+$',
+        'نام کاربری فقط می‌تواند شامل حروف، اعداد و فاصله باشد.'
+    )
+
+
+
+class CustomUser(AbstractUser):
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        validators=[
+            RegexValidator(
+                r'^[a-zA-Z0-9\u0600-\u06FF\s]+$',
+                'نام کاربری فقط می‌تواند شامل حروف، اعداد و فاصله باشد.'
+            )
+        ],
+        verbose_name="نام کاربری"
+    )
+
+    first_name = models.CharField(max_length=150, blank=True, verbose_name="نام")
+    last_name = models.CharField(max_length=150, blank=True, verbose_name="نام خانوادگی")
+
+    def __str__(self):
+        return self.username

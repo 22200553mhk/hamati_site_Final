@@ -42,6 +42,11 @@ INSTALLED_APPS = [
 
     # Local apps
     'analyzer',
+    'reviews',
+    'blog',
+    'core',
+
+
 ]
 
 MIDDLEWARE = [
@@ -155,7 +160,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SOCIALACCOUNT_ADAPTER = "analyzer.adapters.MySocialAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "analyzer.adapters.CustomSocialAccountAdapter"
 
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 #تنظیمات امنیتی پیشرفته
@@ -164,3 +169,11 @@ ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 #CSRF_COOKIE_SECURE = True
 
 ACCOUNT_FORMS = {'signup': 'analyzer.forms.CustomSignupForm'} # <-- این خط را اضافه کنید
+AUTH_USER_MODEL = 'analyzer.CustomUser'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+
+

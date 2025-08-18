@@ -4,9 +4,15 @@
 {% block content %}
 <div class="container mt-4">
     <style>
-        body {
-            background-color: #f0f2f5;
-        }
+       body {
+    font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+    direction: rtl;
+    color: #333;
+    background-color: #f4f7f9;
+    background-image: repeating-linear-gradient(45deg, #eaf0f4 25%, transparent 25%, transparent 75%, #eaf0f4 75%, #eaf0f4),
+                      repeating-linear-gradient(-45deg, #eaf0f4 25%, transparent 25%, transparent 75%, #eaf0f4 75%, #eaf0f4);
+    background-size: 60px 60px;
+  }
 
         .main-title-container {
             border: 3px solid #008080;
@@ -34,6 +40,9 @@
         .subject-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+        .submit-btn{
+            color: white !important;
         }
 
         .card-math { background: linear-gradient(#e57373, #c62828); }
@@ -90,6 +99,9 @@
         .btn-submit-report:hover {
             background-color: #006666;
             border-color: #006666;
+        }
+        .submit-btn-custom:hover {
+            color: white;
         }
     </style>
 
@@ -167,7 +179,7 @@
         </div>
 
         <div class="text-center mt-3 mb-5">
-            <button type="submit" id="submit-btn" class="btn btn-submit-report">
+            <button type="submit" id="submit-btn" class="btn btn-submit-report submit-btn submit-btn-custom">
                 ثبت اطلاعات و دریافت گزارش
             </button>
         </div>

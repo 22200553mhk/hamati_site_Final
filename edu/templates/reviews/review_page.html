@@ -1,0 +1,193 @@
+{% extends 'analyzer/base.html' %}
+{% load static %}
+{% load jalali_filters %}
+
+{% block title %}ثبت نظر{% endblock title %}
+
+{% block extra_head %}
+<style>
+body { background-color: #38A3AD; }
+.main-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.9);
+    margin: 2rem auto;
+    overflow: hidden;
+}
+.form-section { padding: 50px 40px; text-align: center; }
+.form-section h2 { color: #37474f; margin-bottom: 25px; font-size: 1.5rem; }
+
+.star-rating { display: flex; flex-direction: row-reverse; justify-content: center; margin-bottom: 25px; }
+.star-rating i { font-size: 2.5rem; color: #ccc; cursor: pointer; transition: color 0.2s; }
+.star-rating i.selected { color: #ffeb3b; }
+
+.comment-input {
+    width: 100%; height: 120px; padding: 20px 25px; border-radius: 50px;
+    border: none; background-color: #336677 !important; color: white !important;
+    font-family: inherit; font-size: 1.2rem; resize: none; margin-bottom: 25px; box-sizing: border-box;
+}
+.comment-input::placeholder { color: rgba(255,255,255,0.7); }
+.comment-input:focus { outline: none; background-color: #4a7c8c; }
+
+.submit-btn { background-color: #4DB6AC; color: white; border: none; padding: 12px 45px; border-radius: 25px; font-size: 1.1rem; cursor: pointer; transition: background-color 0.3s; }
+.submit-btn:disabled { background-color: #90a4ae; cursor: not-allowed; }
+.submit-btn:hover:enabled { background-color: #26a69a; }
+
+.delete-btn {
+    background-color: #e53935; display: flex; align-items: center; gap: 5px;
+    font-size: 0.9rem; padding: 5px 10px; border-radius: 5px;
+}
+.delete-btn i { font-size: 1rem; }
+.delete-btn:hover { background-color: #c62828; }
+
+.delete-all-btn {
+    background-color: #d32f2f; color: white; border: none; padding: 8px 15px; border-radius: 5px; margin-bottom: 15px; cursor: pointer;
+}
+.delete-all-btn:hover { background-color: #b71c1c; }
+
+.reviews-header-banner { background-color: #336677; padding: 15px 40px; }
+.reviews-header-banner h3 { color: white; text-align: center; margin: 0; font-size: 1.3rem; }
+
+.reviews-list-section { padding: 20px 40px; position: relative; }
+.review-card { background-color: #f5f5f5; border: 1px solid #eee; padding: 20px; border-radius: 10px; margin-bottom: 15px; position: relative; }
+.review-card p { margin: 0; color: #555; line-height: 1.6; }
+.review-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.review-rating { color: #ffca28; }
+.review-date { font-size: 0.85rem; color: #777; }
+.no-reviews { color: #757575; text-align: center; padding: 20px 0; }
+
+.note-disabled { font-size: 0.9rem; color: #d32f2f; margin-bottom: 10px; }
+</style>
+{% endblock extra_head %}
+
+{% block content %}
+<div class="main-container">
+    <div class="form-section">
+        <h2>نظر خود را درمورد پلنیکا ثبت کنید و امتیاز دهید</h2>
+        <form method="post" id="reviewForm">
+            {% csrf_token %}
+            <div class="star-rating">
+                {% for i in "12345" %}
+                    <i class="fas fa-star" data-value="{{ forloop.counter }}"></i>
+                {% endfor %}
+            </div>
+            <input type="hidden" name="rating" id="ratingInput">
+            <textarea name="{{ form.comment.name }}" class="comment-input" placeholder="نظر خود را اینجا بنویسید..."></textarea>
+            <div class="note-disabled" id="noteDisabled">لطفاً امتیاز و نظر خود را وارد کنید.</div>
+            <button type="submit" class="submit-btn" disabled>ثبت نظر</button>
+        </form>
+    </div>
+
+    <div class="reviews-header-banner">
+        <h3>نظرات من</h3>
+    </div>
+
+    <div class="reviews-list-section">
+        {% if user_reviews %}
+            <!-- دکمه حذف همه نظرات -->
+            <form method="post" action="{% url 'reviews:delete_all_reviews' %}">
+                {% csrf_token %}
+                <button type="submit" class="delete-all-btn">
+                    <i class="fas fa-trash"></i> حذف همه نظرات
+                </button>
+            </form>
+
+            {% for review in user_reviews %}
+                <div class="review-card">
+                    <div class="review-card-header">
+                        <div class="review-rating">
+                            {# یک حلقه که همیشه ۵ بار اجرا می‌شود #}
+                            {% for i in "12345" %}
+
+                                {# بررسی می‌کنیم که آیا شماره ستاره فعلی، کوچکتر یا مساوی امتیاز ثبت‌شده است #}
+                                {% if forloop.counter <= review.rating %}
+                                    <i class="fas fa-star" style="color: #ffca28;"></i>  {# ستاره پر #}
+                                {% else %}
+                                    <i class="far fa-star" style="color: #ccc;"></i>  {# ستاره توخالی #}
+                                {% endif %}
+
+                            {% endfor %}
+                        </div>
+                        <span class="review-date">{{ review.created_at|jalali_date }}</span>
+                    </div>
+                    <p>{{ review.comment }}</p>
+
+                    {% if review.user == request.user or request.user.is_staff %}
+                        <form method="post" action="{% url 'reviews:delete_review' review.id %}" style="position:absolute; bottom:10px; left:10px;">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-btn">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-reviews">شما تاکنون نظری ثبت نکرده‌اید.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star-rating i');
+    const ratingInput = document.getElementById('ratingInput');
+    const commentInput = document.querySelector('.comment-input');
+    const submitBtn = document.querySelector('.submit-btn');
+    const noteDisabled = document.getElementById('noteDisabled');
+    const starRatingContainer = document.querySelector('.star-rating');
+
+    // تابعی برای به‌روزرسانی نمایش ستاره‌ها
+    function updateStars(value) {
+        stars.forEach(star => {
+            if (star.dataset.value <= value) {
+                star.classList.add('selected');
+            } else {
+                star.classList.remove('selected');
+            }
+        });
+    }
+
+    // رویداد کلیک روی ستاره‌ها
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const value = star.dataset.value;
+            ratingInput.value = value; // ثبت امتیاز نهایی
+            updateStars(value);
+            checkFormValid();
+        });
+    });
+
+    // اضافه کردن افکت hover برای تجربه کاربری بهتر
+    starRatingContainer.addEventListener('mouseover', (e) => {
+        if (e.target.matches('.star-rating i')) {
+            const hoverValue = e.target.dataset.value;
+            updateStars(hoverValue);
+        }
+    });
+
+    // بازگرداندن ستاره‌ها به امتیاز ثبت‌شده هنگام خروج موس
+    starRatingContainer.addEventListener('mouseout', () => {
+        const selectedValue = ratingInput.value || 0;
+        updateStars(selectedValue);
+    });
+
+    // تابع بررسی اعتبار فرم برای فعال کردن دکمه ثبت
+    function checkFormValid() {
+        if (ratingInput.value && commentInput.value.trim().length > 0) {
+            submitBtn.disabled = false;
+            noteDisabled.style.display = 'none';
+        } else {
+            submitBtn.disabled = true;
+            noteDisabled.style.display = 'block';
+        }
+    }
+    commentInput.addEventListener('input', checkFormValid);
+});
+</script>
+
+<!-- Font Awesome برای آیکون سطل -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+{% endblock content %}

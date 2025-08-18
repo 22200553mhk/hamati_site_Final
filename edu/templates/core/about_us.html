@@ -1,0 +1,298 @@
+{% extends 'analyzer/base.html' %}
+{% load static %}
+
+{% block title %}درباره ما - پلنیکا{% endblock %}
+
+{% block content %}
+<style>
+.about-container {
+    background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+    min-height: 100vh;
+    padding: 40px 20px;
+    font-family: 'IRANSans', Tahoma, Arial, sans-serif;
+}
+
+.page-title {
+    text-align: center;
+    color: white !important;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 60px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.team-member {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.member-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: #2c5f5f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.member-image:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.member-image img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.member-name {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.about-description {
+    max-width: 800px;
+    margin: 60px auto 40px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.about-description h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: white !important;
+}
+
+.about-description h3 {
+    font-size: 1.4rem;
+    margin: 25px 0 15px 0;
+    color: white !important;
+    text-align: right;
+}
+
+.about-description ul {
+    text-align: right;
+    margin: 15px 0;
+    padding-right: 20px;
+}
+
+.about-description li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.about-description p {
+    line-height: 1.8;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.contact-section {
+    max-width: 600px;
+    margin: 40px auto 0;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.contact-section h2 {
+    color: white !important;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.contact-section p {
+    color: white;
+    margin-bottom: 15px;
+}
+
+.contact-section a {
+    color: #FFE66D;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.contact-section a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .team-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        margin-bottom: 40px;
+    }
+
+    .member-image {
+        width: 120px;
+        height: 120px;
+    }
+
+    .about-container {
+        padding: 30px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .member-image {
+        width: 100px;
+        height: 100px;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+    }
+
+    .member-name {
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+<div class="about-container">
+    <h1 class="page-title">تیم پلنیکا</h1>
+
+    <div class="team-grid">
+        <div class="team-member">
+            <div class="member-image">
+                <img src="{% static '/images/koli_abut_us_image_person.png' %}" alt="مصطفی همتی">
+            </div>
+            <p class="member-name">مصطفی همتی</p>
+        </div>
+        <div class="team-member">
+            <div class="member-image">
+                <img src="{% static '/images/koli_abut_us_image_person.png' %}" alt="حسین سلامت">
+            </div>
+            <p class="member-name">حسین سلامت</p>
+        </div>
+        <div class="team-member">
+            <div class="member-image">
+                <img src="{% static '/images/koli_abut_us_image_person.png' %}" alt="طاها نوروزی‌منش">
+            </div>
+            <p class="member-name">طاها نوروزی‌منش</p>
+        </div>
+        <div class="team-member">
+            <div class="member-image">
+                <img src="{% static '/images/koli_abut_us_image_person.png' %}" alt="عرفان صهری">
+            </div>
+            <p class="member-name">عرفان صهری</p>
+        </div>
+        <div class="team-member">
+            <div class="member-image">
+                <img src="{% static '/images/koli_abut_us_image_person.png' %}" alt="علی کوثرمردار">
+            </div>
+            <p class="member-name">علی کوثرمردار</p>
+        </div>
+        <div class="team-member">
+            <div class="member-image">
+                <img src="{% static '/images/koli_abut_us_image_person.png' %}" alt="محمد حسن کمن">
+            </div>
+            <p class="member-name">محمد حسن کمن</p>
+        </div>
+        <div class="team-member">
+            <div class="member-image">
+                <img src="{% static '/images/koli_abut_us_image_person.png' %}" alt="طاها چیت ساز">
+            </div>
+            <p class="member-name">طاها چیت ساز</p>
+        </div>
+        <div class="team-member">
+            <div class="member-image">
+                <img src="{% static '/images/koli_abut_us_image_person.png' %}" alt="ارمیا باغچی">
+            </div>
+            <p class="member-name">ارمیا باغچی</p>
+        </div>
+    </div>
+
+    <div class="about-description">
+        <h2>درباره پلنیکا</h2>
+        <p>
+            پلنیکا مجموعه‌ای است متشکل از ذهن‌هایی جست‌وجوگر و دغدغه‌مند که با نگاهی تحلیلی و مبتنی بر داده، در تلاش‌اند تا مسیر موفقیت در کنکور را برای دانش‌آموزان هموارتر و روشن‌تر کنند.
+        </p>
+        <p>
+            در دنیایی که تلاش بی‌جهت دیگر کافی نیست، ما در پلنیکا بر این باوریم که شناخت، تحلیل و تصمیم‌گیری هوشمندانه، ستون‌های اصلی پیشرفت واقعی‌اند. ما نه صرفاً یک سامانه‌ی آماری هستیم، نه صرفاً توصیه‌گر؛ بلکه یک همراه فکری‌ایم که بر پایه‌ی داده‌های واقعی هر دانش‌آموز، مسیر بهینه و قابل اتکایی برای پیشرفت او طراحی می‌کنیم.
+        </p>
+
+        <h3>روش ما چگونه است؟</h3>
+        <p>پلنیکا با جمع‌آوری و تحلیل اطلاعاتی مثل:</p>
+        <ul>
+            <li>وضعیت تست‌زنی در دروس مختلف (درست، غلط، نزده)</li>
+            <li>ساعات مطالعه‌ی هفتگی</li>
+            <li>روند درصدها و نوسانات در آزمون‌های آزمایشی</li>
+            <li>اولویت‌های فردی و میزان تسلط موضوعی</li>
+        </ul>
+        <p>
+            برای هر فرد، پروفایلی تحلیلی و اختصاصی می‌سازد. این پروفایل، پایه‌ی پیشنهاداتی است که کاملاً شخصی‌سازی‌شده‌اند، دقیق‌اند، و به‌جای شعارهای کلی، مسیرهای واقعی و اجرایی ارائه می‌دهند.
+        </p>
+
+        <h3>هدف ما چیست؟</h3>
+        <p>ما در پلنیکا آمده‌ایم تا:</p>
+        <ul>
+            <li>کیفیت مطالعه را جایگزین کمیت کنیم</li>
+            <li>آزمون‌ها را به ابزاری برای آگاهی تبدیل کنیم، نه استرس</li>
+            <li>و مطالعه را به فرآیندی هدفمند، پیش‌بینی‌پذیر و قابل کنترل بدل کنیم</li>
+        </ul>
+        <p>
+            پلنیکا یک مسیر تازه است؛ جایی که تحلیل، معنا پیدا می‌کند، و یادگیری، جهت می‌گیرد.
+        </p>
+        <hr style="border: 1px solid rgba(255,255,255,0.3); margin: 30px 0;">
+        <p>
+            پلنیکا یک گروه متعهد و خلاق است که با هدف بهینه‌سازی مسیر مطالعه‌ی دانش‌آموزان کنکوری، به تحلیل داده‌های آموزشی و ارائه‌ی پیشنهادات هوشمندانه می‌پردازد.
+        </p>
+        <p>
+            ما معتقدیم موفقیت در کنکور، تنها نتیجه‌ی تلاش زیاد نیست، بلکه حاصل تحلیل دقیق، برنامه‌ریزی فردی و تصمیم‌گیری آگاهانه است. به همین دلیل، پلنیکا با ترکیب بینش تحلیلی و دانش آموزشی، سعی دارد به دانش‌آموزان کمک کند تا با درکی دقیق‌تر از وضعیت تحصیلی خود، به سمت بهبود و پیشرفت حرکت کنند.
+        </p>
+    </div>
+
+    <div class="contact-section">
+        <h2>پل ارتباطی</h2>
+        <p>شما می‌توانید از طریق راه‌ زیر با ما در ارتباط  باشید:</p>
+        <p>ایمیل: <a href="mailto:planikaa110@gmail.com">planikaa110@gmail.com</a></p>
+    </div>
+</div>
+
+{% endblock %}
